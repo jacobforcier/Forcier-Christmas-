@@ -1,5 +1,5 @@
 /* ---------- config ---------- */
-const SITE_VERSION = '2026.11.16.5'; // keep in sync with version.txt and the ?v= tags in index.html
+const SITE_VERSION = '2026.11.16.6'; // keep in sync with version.txt and the ?v= tags in index.html
 const SB_URL = 'https://jkgsytjstauxstiabhwz.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZ3N5dGpzdGF1eHN0aWFiaHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDI2ODAsImV4cCI6MjEwNjE3ODY4MH0.M8OzkHtXxaqGddAfmN26F2it1P-kIgttIUXWBHzgi1g';
 const PARTY = new Date(Date.UTC(2026, 11, 25, 16, 30)); // 11:30am Eastern
@@ -32,7 +32,7 @@ function table(name) {
     remove: (filter) => run('DELETE', filter),
   };
 }
-const T_ITEMS = table('xmas_items'), T_RSVP = table('xmas_rsvps'), T_VOTES = table('xmas_votes'), T_TV = table('xmas_theme_votes');
+const T_ITEMS = table('xmas_items'), T_RSVP = table('xmas_rsvps'), T_VOTES = table('xmas_votes');
 const byId = (id) => `id=eq.${encodeURIComponent(id)}`;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -42,11 +42,7 @@ const store = {
 };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-let theme, items = [], rsvps = [], votes = [], tvVotes = [];
-const XMAS_START = Date.UTC(2026, 11, 25, 5), XMAS_END = Date.UTC(2026, 11, 26, 5); // midnight to midnight Eastern
-const votingOpen = () => Date.now() < XMAS_START;
-const isXmasDay = () => Date.now() >= XMAS_START && Date.now() < XMAS_END;
-let winnerShown = false;
+let theme, items = [], rsvps = [], votes = [];
 
 /* ---------- theme picking ---------- */
 function pickTheme(forceNew) {
@@ -62,7 +58,7 @@ function pickTheme(forceNew) {
 function applyTheme(t) {
   theme = t;
   document.body.dataset.theme = t.id;
-  $('movie').textContent = t.movie + (winnerShown && t.id === winnerId() ? ' · 🏆 the family\u2019s pick' : '');
+  $('movie').textContent = t.movie;
   $('title').textContent = t.title;
   $('tagline').textContent = t.tagline;
   $('menuTitle').textContent = t.menuTitle;
@@ -116,11 +112,10 @@ $('shuffle').addEventListener('click', () => showtime(pickTheme(true)));
 
 /* ---------- data ---------- */
 async function load() {
-  const [a, b, c, d] = await Promise.all([
+  const [a, b, c] = await Promise.all([
     T_ITEMS.list('sort,created_at'),
     T_RSVP.list('created_at'),
     T_VOTES.list('updated_at', 'vote'),
-    T_TV.list('updated_at', 'theme'),
   ]);
   if (a.error || b.error) {
     $('cats').innerHTML = '<p class="loading">Couldn’t reach the North Pole server. Try refreshing in a sec. 📡</p>';
@@ -128,7 +123,6 @@ async function load() {
   }
   items = a.data; rsvps = b.data;
   if (c.data) votes = c.data.map((v) => v.vote);
-  if (d.data) tvVotes = d.data.map((v) => v.theme);
   renderAll();
 }
 let reloadT;
@@ -148,7 +142,7 @@ function renderAll() {
   renderItems();
   renderRsvps();
   renderPoll();
-  renderTV();
+  renderJump();
 }
 
 function renderItems() {
@@ -314,59 +308,30 @@ $('rsvpList').addEventListener('click', async (e) => {
   load();
 });
 
-/* ---------- pick the Christmas Day movie ---------- */
-function tvTally() {
-  const n = Object.fromEntries(THEMES.map((t) => [t.id, 0]));
-  tvVotes.forEach((id) => { if (id in n) n[id]++; });
-  return THEMES.map((t, i) => ({ t, n: n[t.id], i })).sort((a, b) => b.n - a.n || a.i - b.i);
+/* ---------- jump bar ---------- */
+function renderJump() {
+  const open = items.filter((i) => !i.claimed_by).length;
+  $('jbFood').textContent = items.length ? (open ? open : '✓') : '';
+  $('jbFood').classList.toggle('done', items.length > 0 && !open);
 }
-function winnerId() { const top = tvTally()[0]; return top && top.n ? top.t.id : null; }
-
-function renderTV() {
-  const list = $('tvList'); if (!list || !theme) return;
-  const rows = tvTally(), max = Math.max(1, rows[0].n), mine = store.get('xmasTvVote'), open = votingOpen();
-  // FLIP: remember where each row was so reorders glide
-  const before = {};
-  list.querySelectorAll('li[data-tv]').forEach((li) => { before[li.dataset.tv] = li.getBoundingClientRect().top; });
-  list.innerHTML = rows.map(({ t, n }, rank) => `<li data-tv="${t.id}" class="${t.id === mine ? 'mine' : ''} ${t.id === theme.id ? 'now' : ''} ${rank === 0 && n ? 'lead' : ''}">
-    <span class="tv-rank">${rank === 0 && n ? '🏆' : rank + 1}</span>
-    <span class="tv-poster" style="--s1:${t.swatch[0]};--s2:${t.swatch[1]};--s3:${t.swatch[2]}">${t.emoji}</span>
-    <div class="tv-main"><b>${esc(t.name)}</b>
-      <div class="tv-bar"><i style="width:${(n / max) * 100}%"></i></div>
-      <span class="tv-meta">${n} vote${n === 1 ? '' : 's'}${t.id === theme.id ? ' · now showing' : ''}</span></div>
-    <div class="tv-acts">
-      ${t.id === theme.id ? '' : `<button type="button" class="mini" data-preview="${t.id}">preview</button>`}
-      ${open ? `<button type="button" class="tv-vote" data-tvvote="${t.id}">${t.id === mine ? '✓ your pick' : 'vote'}</button>` : ''}
-    </div></li>`).join('');
-  list.querySelectorAll('li[data-tv]').forEach((li) => {
-    const was = before[li.dataset.tv]; if (was === undefined || reduced) return;
-    const dy = was - li.getBoundingClientRect().top; if (!dy) return;
-    li.style.transform = `translateY(${dy}px)`; li.style.transition = 'none';
-    requestAnimationFrame(() => requestAnimationFrame(() => { li.style.transition = 'transform .6s cubic-bezier(.2, 1.2, .4, 1)'; li.style.transform = ''; }));
-  });
-  const w = THEMES.find((t) => t.id === winnerId());
-  $('tvSub').textContent = open
-    ? (mine ? 'You can change your vote until Christmas Eve at midnight.' : 'Vote for your favorite theme. On Christmas Day, the winner is what everyone sees.')
-    : w ? `Voting's closed! ${w.name} won with ${rows[0].n} vote${rows[0].n === 1 ? '' : 's'}. 🏆` : 'Voting’s closed.';
-}
-
-$('tvList').addEventListener('click', async (e) => {
-  const pv = e.target.closest('[data-preview]');
-  if (pv) { const t = THEMES.find((x) => x.id === pv.dataset.preview); store.set('xmasTheme', t.id); showtime(t, () => toast(`🎬 Previewing ${t.name}`)); return; }
-  const b = e.target.closest('[data-tvvote]'); if (!b) return;
-  if (!votingOpen()) return toast('Voting’s closed. Merry Christmas! 🎄');
-  const id = b.dataset.tvvote, prev = store.get('xmasTvVote'), t = THEMES.find((x) => x.id === id);
-  if (prev === id) return toast(`${t.emoji} ${t.name} is already your pick!`);
-  const i = prev ? tvVotes.indexOf(prev) : -1;
-  if (i > -1) tvVotes[i] = id; else tvVotes.push(id);
-  store.set('xmasTvVote', id);
-  renderTV();
-  burst(e.clientX, e.clientY, 50);
-  toast(`${t.emoji} ${prev ? 'Switched your vote to' : 'Voted for'} ${t.name}!`);
-  const { error } = await T_TV.upsert({ voter_key: voterKey, theme: id, updated_at: new Date() }, 'voter_key');
-  if (error) toast('That vote didn’t save. Try again?');
-  reloadSoon();
+$('jump').addEventListener('click', (e) => {
+  const a = e.target.closest('a[data-sec]'); if (!a) return;
+  e.preventDefault();
+  $(a.dataset.sec).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
 });
+// highlight whichever section is on screen
+const jumpLinks = [...document.querySelectorAll('#jump a[data-sec]')];
+const seen = new Map();
+const io = new IntersectionObserver((ents) => {
+  ents.forEach((en) => seen.set(en.target.id, en.isIntersecting ? en.intersectionRatio : 0));
+  let best = null, bestR = 0;
+  jumpLinks.forEach((l) => { const r = seen.get(l.dataset.sec) || 0; if (r > bestR) { bestR = r; best = l.dataset.sec; } });
+  jumpLinks.forEach((l) => l.classList.toggle('on', l.dataset.sec === best));
+}, { rootMargin: '-30% 0px -50% 0px', threshold: [0, .01, .25, .5, 1] });
+jumpLinks.forEach((l) => io.observe($(l.dataset.sec)));
+// show the bar's shadow once it's stuck to the top
+const jumpSentinel = document.createElement('div'); $('jump').before(jumpSentinel);
+new IntersectionObserver(([en]) => $('jump').classList.toggle('stuck', !en.isIntersecting)).observe(jumpSentinel);
 
 /* ---------- add to calendar ---------- */
 const GCAL = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
@@ -638,18 +603,7 @@ checkVersion();
 document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVersion(); });
 
 /* ---------- go ---------- */
-// On Christmas Day the family's pick is the default (a ?theme= link or the shuffle button still work)
-async function start() {
-  const forced = new URLSearchParams(location.search).get('theme');
-  if (isXmasDay() && !forced) {
-    const r = await Promise.race([T_TV.list('updated_at', 'theme'), new Promise((res) => setTimeout(() => res({}), 2500))]);
-    if (r.data) tvVotes = r.data.map((v) => v.theme);
-    const w = THEMES.find((t) => t.id === winnerId());
-    if (w) { winnerShown = true; return applyTheme(w); }
-  }
-  applyTheme(pickTheme(false));
-}
-start();
+applyTheme(pickTheme(false));
 tick();
 load();
 weather();
