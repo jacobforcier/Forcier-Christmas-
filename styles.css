@@ -871,3 +871,5 @@ body.sweater h1 { animation: itch 4s ease-in-out infinite; }
 @keyframes itch { 0%, 92%, 100% { transform: none; } 94% { transform: translateX(-2px) rotate(-1deg); } 96% { transform: translateX(2px) rotate(1deg); } }
 
 [data-theme=polar] .santa-tracker, [data-theme=miracle] .santa-tracker { color: #3a2a10; --muted: #7b6440; --chip: rgba(176,51,31,.12); --accent: #b0331f; }
+.motion-link { display: inline-block; margin-top: 6px; padding: 4px 10px; border: 0; border-radius: 999px; background: var(--accent); color: var(--on-accent); font: inherit; font-size: .8rem; font-weight: 800; font-style: normal; }
+.motion-link:disabled { background: transparent; color: var(--ink); padding-left: 0; }

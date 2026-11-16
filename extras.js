@@ -57,13 +57,16 @@ $('secretsBtn').addEventListener('click', () => {
   openDialog(`🤫 Secrets: ${SECRETS.filter((s) => f.includes(s.id)).length} of ${SECRETS.length}`,
     `<ul class="secret-list">${SECRETS.map((s) => f.includes(s.id)
       ? `<li class="got">✅ <b>${s.name}</b></li>`
-      : `<li>❔ <span>${s.hint}</span></li>`).join('')}</ul>
-     ${needMotion ? '<button type="button" class="btn ghost" id="motionBtn">📳 Let my phone feel shakes</button>' : ''}`,
+      : s.id === 'globe' && needMotion
+        ? `<li>❔ <span>${s.hint}</span> <button type="button" class="motion-link" id="motionBtn">📳 iPhone? Tap here first</button></li>`
+        : `<li>❔ <span>${s.hint}</span></li>`).join('')}</ul>`,
     [{ label: 'Close', value: null, cls: 'ghost' }]);
   const mb = $('motionBtn');
   if (mb) mb.addEventListener('click', async () => {
-    try { if ((await DeviceMotionEvent.requestPermission()) === 'granted') { motionGranted = true; mb.textContent = '📳 Ready. Now shake!'; mb.disabled = true; } }
-    catch { mb.textContent = 'Motion not available'; }
+    try {
+      if ((await DeviceMotionEvent.requestPermission()) === 'granted') { motionGranted = true; mb.textContent = '✅ Ready. Close this and shake!'; mb.disabled = true; }
+      else mb.textContent = 'Motion was turned off. Reopen the page to try again.';
+    } catch { mb.textContent = 'Motion isn\u2019t available on this phone.'; }
   });
 });
 renderSecrets();
@@ -102,19 +105,7 @@ function listenMotion() {
 }
 const motionNeedsPermission = typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function';
 if (typeof DeviceMotionEvent !== 'undefined') listenMotion(); // harmless before permission: iPhones just send nothing until allowed
-// iPhone: motion needs a one-time "Allow" that can only be asked right after a tap. Ask on the first tap anywhere
-// (not while someone is typing in a box), once per visit.
-if (motionNeedsPermission) {
-  const ask = (e) => {
-    if (e.target.closest && e.target.closest('input, textarea, dialog')) return;
-    document.removeEventListener('touchend', ask, true);
-    let asked = null; try { asked = sessionStorage.getItem('xmasMotionAsked'); } catch {}
-    if (asked) return;
-    try { sessionStorage.setItem('xmasMotionAsked', '1'); } catch {}
-    DeviceMotionEvent.requestPermission().then((r) => { if (r === 'granted') motionGranted = true; }).catch(() => {});
-  };
-  document.addEventListener('touchend', ask, true);
-}
+// iPhone: motion needs a one-time "Allow". We only ask from the secrets list (see the shake hint), never by surprise.
 // computers: a quick side-to-side mouse wiggle counts as a shake
 (() => {
   let lx = null, dir = 0, flips = [];
