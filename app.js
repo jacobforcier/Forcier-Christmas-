@@ -1,4 +1,5 @@
 /* ---------- config ---------- */
+const SITE_VERSION = '2026.11.16.2'; // keep in sync with version.txt and the ?v= tags in index.html
 const SB_URL = 'https://jkgsytjstauxstiabhwz.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZ3N5dGpzdGF1eHN0aWFiaHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDI2ODAsImV4cCI6MjEwNjE3ODY4MH0.M8OzkHtXxaqGddAfmN26F2it1P-kIgttIUXWBHzgi1g';
 const PARTY = new Date(Date.UTC(2026, 11, 25, 16, 30)); // 11:30am Eastern
@@ -576,6 +577,22 @@ function snowDay() {
   toast('❄️ SNOW DAY! Secret found — you’re officially on the nice list.');
   setTimeout(() => document.body.classList.remove('snowday'), 9000);
 }
+
+/* ---------- stay up to date ---------- */
+// GitHub Pages lets browsers cache files for ~10 min. If a newer version is live, reload once to pick it up.
+async function checkVersion() {
+  try {
+    const live = (await (await fetch('version.txt?t=' + Date.now(), { cache: 'no-store' })).text()).trim();
+    if (!live || live === SITE_VERSION) return;
+    let tried = null; try { tried = sessionStorage.getItem('xmasReloadedFor'); } catch {}
+    if (tried === live) return; // already reloaded once for this version; don't loop
+    try { sessionStorage.setItem('xmasReloadedFor', live); } catch {}
+    if (dlg.open) return; // never yank the page out from under someone typing
+    location.reload();
+  } catch {}
+}
+checkVersion();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVersion(); });
 
 /* ---------- go ---------- */
 // On Christmas Day the family's pick is the default (a ?theme= link or the shuffle button still work)
