@@ -278,4 +278,265 @@ const THEMES = [
       setTimeout(() => document.body.classList.remove('boom'), 700);
     },
   },
+  {
+    id: 'sadtree',
+    name: 'The Sad Little Tree', emoji: '🌲', swatch: ['#f3ead7', '#c2412d', '#4a7a3d'],
+    movie: 'a sad-little-tree kind of Christmas',
+    title: 'It’s Not Such a Bad Little Tree',
+    tagline: 'All it needs is a little love. And maybe some egg bites.',
+    menuTitle: 'Decorate the Tree',
+    menuSub: 'Every dish you claim hangs another ornament. Watch it stand up straight.',
+    cats: {
+      breakfast: ['Breakfast', 'Good grief, it’s early'],
+      snacks: ['Snacks', 'Popcorn-and-toast dinners not accepted'],
+      dinner: ['Dinner', 'Real food. Not jellybeans.'],
+      dessert: ['Dessert', 'Fuel for skating on the pond'],
+      paper: ['Paper Goods', 'Plates for the whole gang'],
+    },
+    claimBtn: 'Hang an ornament',
+    open: 'Bare branch',
+    rsvpBtn: 'Count us in. Good grief!',
+    foot: 'Christmas isn’t about the stuff. (But please do bring the stuff.)',
+    particles: { kind: 'flake', colors: ['#aab4bf', '#cfd8e0', '#ffffff'], count: 45 },
+    burst: ['#c2412d', '#e0a526', '#4a7a3d', '#3d6fa8'],
+    meter(el, s) {
+      const spots = 20, shown = Math.round(s.pct * spots), done = s.pct >= 1;
+      const droop = (1 - s.pct) * 12, bend = (1 - s.pct) * 26;
+      const levels = [[160, 50], [134, 42], [108, 33], [84, 24], [62, 15]];
+      let br = '', orn = '', k = 0;
+      const cols = ['#c2412d', '#e0a526', '#3d6fa8', '#c2412d'];
+      for (const [y, len] of levels) {
+        const sag = 8 + (1 - s.pct) * 10;
+        br += `<path d="M150 ${y} Q${150 - len * .6} ${y + 2} ${150 - len} ${y + sag}M150 ${y} Q${150 + len * .6} ${y + 2} ${150 + len} ${y + sag}"/>`;
+        for (const [x, yy] of [[150 - len, y + sag], [150 + len, y + sag], [150 - len * .5, y + sag * .45], [150 + len * .5, y + sag * .45]]) {
+          if (k < shown) orn += `<circle cx="${x}" cy="${yy + 5}" r="5" fill="${cols[k % 4]}"/><circle cx="${x - 1.6}" cy="${yy + 3.4}" r="1.5" fill="#fff" opacity=".7"/>`;
+          k++;
+        }
+      }
+      const tipX = 150 + bend * 1.6, tipY = 34 + bend * .5;
+      el.innerHTML = `<svg viewBox="0 0 300 210" class="sadtree">
+        <ellipse cx="150" cy="196" rx="120" ry="12" fill="#fff" opacity=".9"/>
+        <g class="tree" style="transform: rotate(${droop}deg)">
+          <path class="trunk" d="M150 194 L150 120 Q150 ${70 + bend * .3} ${tipX} ${tipY}" fill="none"/>
+          <g class="branches" fill="none">${br}</g>${orn}
+          ${done ? `<polygon class="star" points="${tipX},${tipY - 14} ${tipX + 4},${tipY - 4} ${tipX + 14},${tipY - 4} ${tipX + 6},${tipY + 2} ${tipX + 9},${tipY + 12} ${tipX},${tipY + 6} ${tipX - 9},${tipY + 12} ${tipX - 6},${tipY + 2} ${tipX - 14},${tipY - 4} ${tipX - 4},${tipY - 4}"/>` : ''}
+        </g>
+        ${done ? '<path class="blanket" d="M118 196 Q120 176 150 178 Q180 176 182 196 Z"/>' : ''}
+      </svg>
+      <p class="meter-label"><b>${shown}</b> of ${spots} ornaments · ${s.claimed}/${s.total} dishes claimed${done ? ' · <em>WHAT A TREE!</em>' : ''}</p>`;
+    },
+    gag(el) {
+      el.classList.add('sag');
+      toast('🌲 It’s not a bad little tree. It just needs a little love.');
+      setTimeout(() => el.classList.remove('sag'), 1600);
+    },
+  },
+  {
+    id: 'frosty',
+    name: 'Frosty', emoji: '⛄', swatch: ['#dff1ff', '#e8483c', '#13385c'],
+    movie: 'a build-a-snowman afternoon',
+    title: 'Build-a-Snowman Christmas',
+    tagline: 'Every dish adds another piece. Finish him and he comes to life.',
+    menuTitle: 'Snowman Supplies',
+    menuSub: 'Claim a dish to roll the next snowball.',
+    cats: {
+      breakfast: ['Breakfast', 'Fuel before the snowball fight'],
+      snacks: ['Snacks', 'Snow-day snacking'],
+      dinner: ['Dinner', 'Warm-you-up stew (keep it away from Frosty)'],
+      dessert: ['Dessert', 'Treats that won’t melt him'],
+      paper: ['Paper Goods', 'Coal, carrots & paper plates'],
+    },
+    claimBtn: 'Roll a snowball',
+    open: 'Melted',
+    rsvpBtn: 'Thumpety-thump, we’re coming!',
+    foot: 'Don’t cry. He’ll be back again someday. Like leftovers.',
+    particles: { kind: 'flake', colors: ['#ffffff', '#a9d3f5', '#ffffff'], count: 95 },
+    burst: ['#ffffff', '#e8483c', '#ff9f1c', '#13385c', '#a9d3f5'],
+    steps: ['a pile of snow', 'bottom snowball', 'middle snowball', 'his head', 'coal & a carrot', 'a scarf', 'THE HAT'],
+    meter(el, s) {
+      const st = s.pct >= 1 ? 6 : Math.floor(s.pct * 6), prev = this._st ?? st;
+      this._st = st;
+      const pop = (n) => (n > prev ? ' pop' : '');
+      el.innerHTML = `<svg viewBox="0 0 300 210" class="snowman ${st >= 6 ? 'alive' : ''}">
+        <ellipse cx="150" cy="196" rx="130" ry="13" fill="#fff"/>
+        ${st < 1 ? '<path d="M110 196 Q150 168 190 196 Z" fill="#fff" stroke="#cfe3f3" stroke-width="2"/>' : ''}
+        ${st >= 1 ? `<circle class="ball${pop(1)}" cx="150" cy="160" r="38"/>` : ''}
+        ${st >= 2 ? `<circle class="ball${pop(2)}" cx="150" cy="106" r="28"/>` : ''}
+        ${st >= 3 ? `<circle class="ball${pop(3)}" cx="150" cy="64" r="20"/>` : ''}
+        ${st >= 4 ? `<g class="face${pop(4)}"><circle cx="143" cy="60" r="2.6"/><circle cx="157" cy="60" r="2.6"/><path d="M150 66 L170 70 L150 71 Z" fill="#ff9f1c"/>
+          <circle cx="150" cy="96" r="2.6"/><circle cx="150" cy="108" r="2.6"/><circle cx="150" cy="120" r="2.6"/>
+          <path class="arm l" d="M124 102 L96 86 M106 92 L100 80" /><path class="arm r" d="M176 102 L204 86 M194 92 L202 80"/></g>` : ''}
+        ${st >= 5 ? `<g class="scarf${pop(5)}"><path d="M130 80 Q150 90 170 80 L170 87 Q150 97 130 87 Z"/><path d="M160 86 L166 112 L156 112 L152 88 Z"/></g>` : ''}
+        ${st >= 6 ? `<g class="hat${pop(6)}"><rect x="134" y="42" width="32" height="5" rx="2"/><rect x="139" y="16" width="22" height="28" rx="2"/><rect x="139" y="36" width="22" height="5" fill="#e8483c"/></g>` : ''}
+      </svg>
+      <p class="meter-label">${st >= 6 ? '<em>HE’S ALIVE!</em>' : `Next up: <b>${this.steps[st + 1]}</b>`} · ${s.claimed}/${s.total} dishes claimed</p>`;
+    },
+    gag(el) {
+      el.classList.add('hop');
+      const r = el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height * .3, 70);
+      toast('⛄ Happy birthday!');
+      setTimeout(() => el.classList.remove('hop'), 1200);
+    },
+  },
+  {
+    id: 'hallmark',
+    name: 'Cozy Small-Town Romance', emoji: '💌', swatch: ['#fbeee9', '#c0587e', '#b98a4b'],
+    movie: 'a cozy made-for-TV holiday romance',
+    title: 'Christmas in Dunbarton Falls',
+    tagline: 'A big-city lawyer comes home and learns the true meaning of buffalo chicken dip.',
+    menuTitle: 'The Bakery Order',
+    menuSub: 'Save the family inn, one dish at a time.',
+    cats: {
+      breakfast: ['Breakfast', 'Coffee-shop meet-cute'],
+      snacks: ['Snacks', 'Cookie-decorating contest (it’s rigged)'],
+      dinner: ['Dinner', 'The town tree-lighting supper'],
+      dessert: ['Dessert', 'Grandma’s secret recipe (it’s love)'],
+      paper: ['Paper Goods', 'Plaid. Everything plaid.'],
+    },
+    claimBtn: 'Save the inn',
+    open: 'Needs a hero',
+    rsvpBtn: 'We’ll be home for Christmas',
+    foot: 'No big-city promotions were accepted in the making of this Christmas.',
+    particles: { kind: 'flake', colors: ['#ffffff', '#f2c4d2', '#e9d3b0'], count: 70 },
+    burst: ['#c0587e', '#f2c4d2', '#b98a4b', '#ffffff'],
+    plot: [['Arrives', 0], ['Meets baker', 1 / 3], ['Saves inn', 2 / 3], ['Snowfall kiss', 1]],
+    meter(el, s) {
+      const x = (p) => 40 + p * 520;
+      const cur = this.plot.filter(([, p]) => s.pct >= p).pop();
+      el.innerHTML = `<svg viewBox="0 0 600 112" class="plot">
+        <path d="M40 54 H560" class="track"/><path d="M40 54 H${x(s.pct)}" class="fill"/>
+        ${this.plot.map(([t, p]) => `<g class="beat ${s.pct >= p ? 'hit' : ''}"><circle cx="${x(p)}" cy="54" r="9"/><text x="${x(p)}" y="96" text-anchor="${p === 0 ? 'start' : p === 1 ? 'end' : 'middle'}" dx="${p === 0 ? -8 : p === 1 ? 8 : 0}">${t}</text></g>`).join('')}
+        <text class="heart" x="${x(s.pct)}" y="40" text-anchor="middle">💗</text>
+      </svg>
+      <p class="meter-label">Cheese-o-Meter: <b>${Math.round(s.pct * 100)}%</b> · Act: <em>${cur[0]}</em> · ${s.claimed}/${s.total} claimed</p>`;
+    },
+    gag(el) {
+      const r = el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 70);
+      el.classList.add('swoon');
+      toast('❄️ Snow begins to fall. Cue the string music. 🎻');
+      setTimeout(() => el.classList.remove('swoon'), 1600);
+    },
+  },
+  {
+    id: 'rudolph',
+    name: 'Rudolph', emoji: '🦌', swatch: ['#1d2b45', '#ff3b3b', '#ffd166'],
+    movie: 'a stop-motion Christmas classic',
+    title: 'Foggy Christmas Eve',
+    tagline: 'One very bright nose and a whole lot of side dishes will get this sleigh off the ground.',
+    menuTitle: 'The Sleigh Manifest',
+    menuSub: 'Every claimed dish turns the nose up a notch.',
+    cats: {
+      breakfast: ['Breakfast', 'Pre-flight fuel'],
+      snacks: ['Snacks', 'Reindeer-games snacks'],
+      dinner: ['Dinner', 'Supper at the North Pole'],
+      dessert: ['Dessert', 'Abominably good desserts'],
+      paper: ['Paper Goods', 'Misfit plates & cups'],
+    },
+    claimBtn: 'Light it up',
+    open: 'Misfit dish',
+    rsvpBtn: 'Ready for takeoff!',
+    foot: 'Every misfit has a seat at this table.',
+    particles: { kind: 'flake', colors: ['#ffffff', '#dfe7f3'], count: 75 },
+    burst: ['#ff3b3b', '#ffd166', '#ffffff', '#7fb3ff'],
+    meter(el, s) {
+      const glow = 18 + s.pct * 80, fog = (1 - s.pct) * .9;
+      el.innerHTML = `<svg viewBox="0 0 300 200" class="rudolph">
+        <defs><radialGradient id="ng"><stop offset="0" stop-color="#ff5b5b" stop-opacity=".95"/><stop offset=".35" stop-color="#ff3b3b" stop-opacity=".45"/><stop offset="1" stop-color="#ff3b3b" stop-opacity="0"/></radialGradient>
+          <filter id="fogblur"><feGaussianBlur stdDeviation="8"/></filter></defs>
+        <circle class="glow" cx="150" cy="128" r="${glow}" fill="url(#ng)" style="opacity:${.35 + s.pct * .65}"/>
+        <g class="antler"><path d="M118 62 Q100 30 84 20 M104 40 Q90 38 82 44 M110 50 Q96 56 92 64"/><path d="M182 62 Q200 30 216 20 M196 40 Q210 38 218 44 M190 50 Q204 56 208 64"/></g>
+        <ellipse cx="150" cy="100" rx="38" ry="44" fill="#8a5a36"/><ellipse cx="150" cy="122" rx="24" ry="18" fill="#c08b5c"/>
+        <circle cx="136" cy="88" r="5" fill="#1a1a1a"/><circle cx="164" cy="88" r="5" fill="#1a1a1a"/><circle cx="137.5" cy="86.5" r="1.6" fill="#fff"/><circle cx="165.5" cy="86.5" r="1.6" fill="#fff"/>
+        <circle class="nose" cx="150" cy="122" r="11" fill="#ff3b3b"/><circle cx="146" cy="118" r="3" fill="#fff" opacity=".7"/>
+        <g class="fog" filter="url(#fogblur)" style="opacity:${fog}"><ellipse cx="60" cy="150" rx="90" ry="26"/><ellipse cx="240" cy="140" rx="100" ry="30"/><ellipse cx="150" cy="178" rx="160" ry="26"/><ellipse cx="90" cy="70" rx="70" ry="20"/><ellipse cx="230" cy="64" rx="70" ry="22"/></g>
+      </svg>
+      <p class="meter-label">Nose power: <b>${Math.round(s.pct * 100)}%</b> · ${s.pct >= 1 ? '<em>FOG CLEARED. WE FLY!</em>' : s.pct > .6 ? 'fog lifting' : 'fog’s thick'} · ${s.claimed}/${s.total} claimed</p>`;
+    },
+    gag(el) {
+      el.classList.add('flash');
+      toast('🔴 Nose to full power. Fog doesn’t stand a chance.');
+      setTimeout(() => el.classList.remove('flash'), 1400);
+    },
+  },
+  {
+    id: 'carol',
+    name: 'A Christmas Carol', emoji: '🕯️', swatch: ['#1a130c', '#efd9a7', '#8c2f1e'],
+    movie: 'A Christmas Carol, by candlelight',
+    title: 'God Bless Us, Every One',
+    tagline: 'Three ghosts. One family. Absolutely no humbug.',
+    menuTitle: 'The Ledger',
+    menuSub: 'Settle an account: every claim lights the ghosts’ candles.',
+    cats: {
+      breakfast: ['Breakfast', 'Christmas morning, reformed-miser style'],
+      snacks: ['Snacks', 'Fezziwig’s party spread'],
+      dinner: ['Dinner', 'The Cratchits’ table'],
+      dessert: ['Dessert', 'Christmas pudding & such'],
+      paper: ['Paper Goods', 'Counting-house supplies'],
+    },
+    claimBtn: 'Settle it',
+    open: 'Unpaid',
+    rsvpBtn: 'We’ll keep Christmas well',
+    foot: 'Keep Christmas in your heart all year. Keep the leftovers in the fridge.',
+    particles: { kind: 'flake', colors: ['#ffffff', '#e8d6ae'], count: 60 },
+    burst: ['#efd9a7', '#ffb347', '#ffffff', '#8c2f1e'],
+    meter(el, s) {
+      const lit = s.pct >= 1 ? 3 : Math.floor(s.pct * 3);
+      const names = ['Past', 'Present', 'Yet to Come'];
+      el.innerHTML = `<div class="candles">${names.map((n, i) => `<div class="candle ${i < lit ? 'lit' : ''}">
+        <span class="flame"></span><span class="wax" style="height:${70 - i * 8}px"></span><span class="cname">${n}</span></div>`).join('')}</div>
+      <p class="meter-label"><b>${lit}</b> of 3 ghosts’ candles lit · accounts settled: ${s.claimed}/${s.total}${lit === 3 ? ' · <em>NO HUMBUG HERE</em>' : ''}</p>`;
+    },
+    gag() {
+      document.body.classList.remove('haunt'); void document.body.offsetWidth; document.body.classList.add('haunt');
+      toast('👻 Bah, hum… just kidding. Merry Christmas!');
+      setTimeout(() => document.body.classList.remove('haunt'), 2200);
+    },
+  },
+  {
+    id: 'miracle',
+    name: 'Miracle on 34th Street', emoji: '✉️', swatch: ['#2a0f12', '#f3d9a4', '#c8102e'],
+    movie: 'a Miracle on 34th Street kind of case',
+    title: 'The People vs. Skipping Christmas',
+    tagline: 'Exhibit A: Santa is real. Exhibit B: this sign-up sheet.',
+    menuTitle: 'Evidence for the Court',
+    menuSub: 'Every claimed dish delivers another sack of letters to Santa.',
+    cats: {
+      breakfast: ['Breakfast', 'Parade-morning breakfast'],
+      snacks: ['Snacks', 'Department-store samples'],
+      dinner: ['Dinner', 'Exhibit C: stew'],
+      dessert: ['Dessert', 'Exhibit D: dessert'],
+      paper: ['Paper Goods', 'Court-approved paper goods'],
+    },
+    claimBtn: 'Deliver it',
+    open: 'Undelivered',
+    rsvpBtn: 'We believe!',
+    foot: 'Believing is easy when there’s a fifth dessert.',
+    particles: { kind: 'flake', colors: ['#ffffff', '#f3d9a4'], count: 60 },
+    burst: ['#f3d9a4', '#c8102e', '#ffffff', '#2e6b3f'],
+    meter(el, s) {
+      const max = 12, n = Math.round(s.pct * max), done = s.pct >= 1;
+      const rows = [5, 4, 2, 1]; let sacks = '', k = 0;
+      rows.forEach((cnt, r) => {
+        for (let i = 0; i < cnt; i++) {
+          if (k < n) {
+            const x = 150 - (cnt * 34) / 2 + i * 34 + 17, y = 150 - r * 26;
+            sacks += `<g class="sack" transform="translate(${x} ${y})"><path d="M-15 10 Q-17 -8 -6 -12 L6 -12 Q17 -8 15 10 Z"/><path class="tie" d="M-6 -12 L0 -17 L6 -12"/><text y="4" text-anchor="middle">✉</text></g>`;
+          }
+          k++;
+        }
+      });
+      el.innerHTML = `<svg viewBox="0 0 300 200" class="court">
+        <rect x="40" y="164" width="220" height="30" rx="3" class="bench"/><rect x="40" y="160" width="220" height="6" class="bench-top"/>
+        <text x="150" y="185" text-anchor="middle" class="seal">⚖ THE PEOPLE v. SKIPPING CHRISTMAS</text>
+        ${sacks}
+        ${done ? '<g class="verdict"><rect x="66" y="22" width="168" height="30" rx="4"/><text x="150" y="43" text-anchor="middle">CASE DISMISSED!</text></g>' : ''}
+      </svg>
+      <p class="meter-label"><b>${n}</b> of ${max} sacks of letters delivered · ${s.claimed}/${s.total} dishes claimed</p>`;
+    },
+    gag(el) {
+      el.classList.remove('gavel'); void el.offsetWidth; el.classList.add('gavel');
+      toast('⚖️ Order in the court! Santa Claus is real.');
+      setTimeout(() => el.classList.remove('gavel'), 900);
+    },
+  },
 ];

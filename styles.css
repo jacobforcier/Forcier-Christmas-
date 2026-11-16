@@ -502,3 +502,190 @@ body.boom::after { content: ''; position: fixed; inset: 0; z-index: 80; pointer-
 [data-theme=polar] .jump a { color: #3a2a10; }
 [data-theme=polar] .jump a.on { background: #b0331f; color: #fff; }
 @media (max-width: 420px) { .jump { gap: 5px; padding: 10px 10px; } .jump a { padding: 7px 10px; font-size: .8rem; gap: 4px; } .jump .jb { min-width: 18px; height: 18px; padding: 0 5px; } }
+
+/* ================================================================
+   THEME 8 · THE SAD LITTLE TREE — newsprint comic, muted & sweet
+   ================================================================ */
+[data-theme=sadtree] {
+  --bg: #f3ead7; --ink: #3b3a36; --muted: #75705f; --accent: #c2412d; --on-accent: #fff; --accent2: #4a7a3d; --on-accent2: #fff;
+  --card: #fbf6ea; --chip: #ece2c9; --hover: #f5ecd8; --line: #d8cba9; --field: #fffdf6;
+  --border: 2px solid #3b3a36; --r: 6px; --btnr: 6px; --dlg: #fbf6ea; --toast: #3b3a36; --warn: #c2412d;
+  --body: 'Nunito', system-ui, sans-serif; --h1: 400 clamp(2.1rem, 7.5vw, 4rem) 'Short Stack', cursive; --h2: 400 clamp(1.6rem, 4.6vw, 2.3rem) 'Short Stack', cursive; --h3: 400 1rem 'Short Stack', cursive;
+  background: radial-gradient(circle at 1px 1px, rgba(59,58,54,.08) 1px, transparent 1.5px) 0 0/6px 6px, #f3ead7;
+}
+[data-theme=sadtree] h1 { transform: rotate(-1deg); }
+[data-theme=sadtree] .cat, [data-theme=sadtree] .fact, [data-theme=sadtree] .tally, [data-theme=sadtree] .rsvp-form, [data-theme=sadtree] .wx { box-shadow: 3px 3px 0 #3b3a36; }
+[data-theme=sadtree] .cat:nth-child(odd) { border-radius: 4px 10px 6px 12px; }
+[data-theme=sadtree] .item .claim { background: #c2412d; border-radius: 4px; animation: none; }
+[data-theme=sadtree] .item .who { color: #4a7a3d; }
+[data-theme=sadtree] .item .who::before { content: '● '; color: #c2412d; }
+[data-theme=sadtree] .sadtree { width: min(300px, 80%); overflow: visible; }
+[data-theme=sadtree] .sadtree .tree { transform-origin: 150px 194px; transform-box: view-box; transition: transform 1.4s cubic-bezier(.3, 1.6, .5, 1); }
+[data-theme=sadtree] .sadtree .trunk { stroke: #6b4f2a; stroke-width: 4; stroke-linecap: round; }
+[data-theme=sadtree] .sadtree .branches path { stroke: #4a7a3d; stroke-width: 3.2; stroke-linecap: round; }
+[data-theme=sadtree] .sadtree .star { fill: #f2c230; filter: drop-shadow(0 0 6px #f2c230); animation: twinkle 1.6s infinite; }
+[data-theme=sadtree] .sadtree .blanket { fill: #3d6fa8; }
+[data-theme=sadtree] .meter.sag .tree { animation: sag 1.5s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes sag { 30% { rotate: 22deg; } 60% { rotate: -6deg; } }
+[data-theme=sadtree] .countdown b { color: #c2412d; }
+
+/* ================================================================
+   THEME 9 · FROSTY — icy blue, round & bouncy
+   ================================================================ */
+[data-theme=frosty] {
+  --bg: #dff1ff; --ink: #13385c; --muted: #4f7193; --accent: #e8483c; --on-accent: #fff; --accent2: #ff9f1c; --on-accent2: #13385c;
+  --card: rgba(255,255,255,.75); --chip: #cfe6f8; --hover: #eef7ff; --line: #b4d4ee; --field: #fff;
+  --border: 2px solid #ffffff; --r: 22px; --dlg: #f4faff; --toast: #13385c; --warn: #e8483c;
+  --body: 'Nunito', system-ui, sans-serif; --h1: 700 clamp(2.4rem, 8.5vw, 4.6rem) 'Fredoka', sans-serif; --h2: 700 clamp(1.8rem, 5vw, 2.6rem) 'Fredoka', sans-serif; --h3: 700 1rem 'Fredoka', sans-serif;
+  --title: #13385c;
+  background: linear-gradient(#c6e4fb, #eaf6ff 45%, #ffffff);
+  background-color: #ffffff;
+}
+[data-theme=frosty] h1 { text-shadow: 0 4px 0 #fff, 0 8px 20px rgba(19,56,92,.25); }
+[data-theme=frosty] .cat, [data-theme=frosty] .fact, [data-theme=frosty] .tally, [data-theme=frosty] .rsvp-form, [data-theme=frosty] .wx, [data-theme=frosty] .countdown div { box-shadow: 0 10px 30px rgba(19,56,92,.12); }
+[data-theme=frosty] .item .claim { background: #e8483c; }
+[data-theme=frosty] .item .who { color: #13385c; }
+[data-theme=frosty] .item .who::before { content: '❄ '; color: #4f9be0; }
+[data-theme=frosty] .snowman { width: min(300px, 80%); overflow: visible; }
+[data-theme=frosty] .snowman .ball { fill: #fff; stroke: #cfe3f3; stroke-width: 2; }
+[data-theme=frosty] .snowman .face circle { fill: #1f1f1f; }
+[data-theme=frosty] .snowman .arm { stroke: #6b4f2a; stroke-width: 3; stroke-linecap: round; fill: none; transform-box: fill-box; }
+[data-theme=frosty] .snowman .arm.r { transform-origin: 0% 100%; }
+[data-theme=frosty] .snowman.alive .arm.r { animation: wave 1s ease-in-out infinite; }
+@keyframes wave { 50% { transform: rotate(-22deg); } }
+[data-theme=frosty] .snowman .scarf path { fill: #e8483c; }
+[data-theme=frosty] .snowman .hat rect { fill: #1f1f1f; }
+[data-theme=frosty] .snowman .pop { transform-box: fill-box; transform-origin: 50% 100%; animation: popin .7s cubic-bezier(.2, 1.8, .4, 1); }
+@keyframes popin { from { transform: scale(0); } }
+[data-theme=frosty] .snowman.alive .hat { transform-box: fill-box; transform-origin: 50% 100%; animation: hattip 3s ease-in-out infinite; }
+@keyframes hattip { 0%, 80%, 100% { transform: none; } 88% { transform: translateY(-6px) rotate(-10deg); } }
+[data-theme=frosty] .meter.hop svg { animation: hop .6s cubic-bezier(.3, 1.6, .5, 1) 2; }
+@keyframes hop { 50% { transform: translateY(-14px); } }
+
+/* ================================================================
+   THEME 10 · COZY SMALL-TOWN ROMANCE — blush, script, soft focus
+   ================================================================ */
+[data-theme=hallmark] {
+  --bg: #fbeee9; --ink: #4a3236; --muted: #8a6a6f; --accent: #c0587e; --on-accent: #fff; --accent2: #b98a4b; --on-accent2: #fff;
+  --card: rgba(255,255,255,.7); --chip: #f6dbe2; --hover: #fff5f7; --line: #edcbd4; --field: #fffafb;
+  --border: 1px solid #f0d2da; --r: 20px; --dlg: #fff7f8; --toast: #c0587e; --warn: #c0587e;
+  --body: 'Nunito', system-ui, sans-serif; --h1: 400 clamp(2.8rem, 10vw, 5.4rem) 'Great Vibes', cursive; --h2: 700 italic clamp(1.7rem, 4.8vw, 2.5rem) 'Playfair Display', serif; --h3: 700 1rem 'Playfair Display', serif;
+  --title: #a8405f;
+  background: radial-gradient(ellipse at 50% 0%, #ffffff 0%, transparent 60%), radial-gradient(ellipse at 100% 100%, #f7d9c9, transparent 50%), #fbeee9;
+  background-color: #fbeee9;
+}
+[data-theme=hallmark] h1 { text-shadow: 0 0 30px rgba(255,255,255,.9), 0 2px 0 rgba(255,255,255,.8); line-height: 1.1; }
+[data-theme=hallmark] .hero::after { content: ''; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 120px 40px rgba(255,255,255,.55); border-radius: 40px; }
+[data-theme=hallmark] .cat { box-shadow: 0 12px 40px rgba(192,88,126,.12); }
+[data-theme=hallmark] .item .claim { background: linear-gradient(135deg, #c0587e, #d98aa4); }
+[data-theme=hallmark] .item .who { color: #a07434; font-style: italic; }
+[data-theme=hallmark] .item .who::before { content: '♥ '; color: #c0587e; font-style: normal; }
+[data-theme=hallmark] .plot { width: 100%; overflow: visible; }
+[data-theme=hallmark] .plot .track { stroke: #edcbd4; stroke-width: 6; stroke-linecap: round; }
+[data-theme=hallmark] .plot .fill { stroke: #c0587e; stroke-width: 6; stroke-linecap: round; }
+[data-theme=hallmark] .plot .beat circle { fill: #fff; stroke: #edcbd4; stroke-width: 3; }
+[data-theme=hallmark] .plot .beat.hit circle { fill: #c0587e; stroke: #fff; }
+[data-theme=hallmark] .plot .beat text { font: italic 700 20px 'Playfair Display', serif; fill: #8a6a6f; }
+[data-theme=hallmark] .plot .beat.hit text { fill: #a8405f; }
+[data-theme=hallmark] .plot .heart { font-size: 30px; animation: bob 2.4s ease-in-out infinite; }
+[data-theme=hallmark] .meter.swoon .plot .heart { animation: swoon .5s ease-in-out 3; }
+@keyframes swoon { 50% { font-size: 40px; } }
+[data-theme=hallmark] .countdown b { color: #c0587e; font-family: 'Playfair Display'; }
+
+/* ================================================================
+   THEME 11 · RUDOLPH — foggy night, felt-and-clay stop-motion
+   ================================================================ */
+[data-theme=rudolph] {
+  --bg: #1d2b45; --ink: #f4efe6; --muted: #b3bdd0; --accent: #ff3b3b; --on-accent: #fff; --accent2: #ffd166; --on-accent2: #1d2b45;
+  --card: #2a3a5a; --chip: rgba(255,255,255,.1); --hover: rgba(255,255,255,.05); --line: rgba(255,255,255,.2); --field: rgba(0,0,0,.25);
+  --border: 3px solid #3d5079; --r: 18px; --dlg: #24365a; --toast: #ff3b3b; --warn: #ff7676;
+  --body: 'Nunito', system-ui, sans-serif; --h1: 800 clamp(2.5rem, 9vw, 4.8rem) 'Sniglet', cursive; --h2: 800 clamp(1.8rem, 5vw, 2.6rem) 'Sniglet', cursive; --h3: 800 1rem 'Sniglet', cursive;
+  --title: #ffd166;
+  background: radial-gradient(ellipse at 50% 120%, rgba(255,255,255,.18), transparent 60%), linear-gradient(#141f35, #1d2b45 60%, #2b3d60);
+  background-color: #2b3d60;
+}
+[data-theme=rudolph] h1 { text-shadow: 3px 3px 0 #b3262b, 6px 6px 0 rgba(0,0,0,.3); }
+/* felt texture on cards */
+[data-theme=rudolph] .cat, [data-theme=rudolph] .fact, [data-theme=rudolph] .tally, [data-theme=rudolph] .rsvp-form, [data-theme=rudolph] .wx {
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.025) 0 2px, transparent 2px 5px); border-style: dashed; }
+[data-theme=rudolph] .item .claim { background: #ff3b3b; box-shadow: 0 0 10px rgba(255,59,59,.6); }
+[data-theme=rudolph] .item .who { color: #ffd166; }
+[data-theme=rudolph] .rudolph { width: min(300px, 80%); overflow: visible; }
+[data-theme=rudolph] .rudolph .antler path { stroke: #c9a27a; stroke-width: 6; stroke-linecap: round; fill: none; }
+[data-theme=rudolph] .rudolph .fog ellipse { fill: #c9d3e3; }
+[data-theme=rudolph] .rudolph .fog { transition: opacity 1.4s; }
+[data-theme=rudolph] .rudolph .glow { transition: r 1.4s, opacity 1.4s; animation: pulse 2.4s ease-in-out infinite; transform-origin: 150px 128px; transform-box: view-box; }
+@keyframes pulse { 50% { transform: scale(1.08); } }
+[data-theme=rudolph] .rudolph .nose { filter: drop-shadow(0 0 6px #ff3b3b); }
+[data-theme=rudolph] .meter.flash .glow { animation: flashnose .25s ease-in-out 5; opacity: 1 !important; }
+[data-theme=rudolph] .meter.flash .fog { opacity: 0 !important; transition: opacity .3s; }
+@keyframes flashnose { 50% { transform: scale(1.6); } }
+[data-theme=rudolph] .countdown b { color: #ffd166; font-family: 'Sniglet'; font-weight: 800; }
+
+/* ================================================================
+   THEME 12 · A CHRISTMAS CAROL — candlelit Victorian ledger
+   ================================================================ */
+[data-theme=carol] {
+  --bg: #1a130c; --ink: #efe2c4; --muted: #b9a37a; --accent: #e7b961; --on-accent: #1a130c; --accent2: #d97a4a; --on-accent2: #1a130c;
+  --card: rgba(239,226,196,.05); --chip: rgba(231,185,97,.14); --hover: rgba(231,185,97,.06); --line: rgba(239,226,196,.22); --field: rgba(0,0,0,.35);
+  --border: 1px solid rgba(231,185,97,.3); --r: 4px; --btnr: 3px; --dlg: #22180f; --toast: #e7b961; --toast-ink: #1a130c; --warn: #e07a5f;
+  --body: 'IM Fell English', Georgia, serif; --h1: 400 clamp(2.3rem, 8vw, 4.4rem) 'IM Fell English SC', serif; --h2: 400 clamp(1.8rem, 5vw, 2.6rem) 'IM Fell English SC', serif; --h3: 400 1rem 'IM Fell English SC', serif;
+  --title: #f2d58e;
+  background: radial-gradient(ellipse 70% 50% at 50% 18%, rgba(231,160,70,.22), transparent 70%), radial-gradient(ellipse at 50% 100%, #000 0%, transparent 70%), #1a130c;
+}
+[data-theme=carol] h1 { text-shadow: 0 0 22px rgba(231,185,97,.45); }
+[data-theme=carol] body, [data-theme=carol] { font-size: 18px; }
+[data-theme=carol] .cat { border-left: 3px double rgba(231,185,97,.5); }
+[data-theme=carol] .item .dots { border-bottom-style: solid; border-bottom-width: 1px; }
+[data-theme=carol] .item .claim { background: none; color: var(--accent); border: 1px solid var(--accent); border-radius: 2px; font-style: italic; animation: none; }
+[data-theme=carol] .item .who { font-style: italic; color: #f2d58e; }
+[data-theme=carol] .item .who::before { content: '✒ '; }
+[data-theme=carol] .candles { display: flex; justify-content: center; align-items: flex-end; gap: 34px; height: 150px; padding-top: 10px; }
+[data-theme=carol] .candle { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+[data-theme=carol] .candle .wax { width: 26px; border-radius: 4px 4px 2px 2px; background: linear-gradient(90deg, #d9cfb8, #f6efdd 45%, #c9bea5); box-shadow: 0 0 0 0 rgba(255,190,90,0); transition: box-shadow 1s; }
+[data-theme=carol] .candle .wax::before { content: ''; display: block; width: 2px; height: 8px; margin: -8px auto 0; background: #222; }
+[data-theme=carol] .candle .flame { width: 14px; height: 24px; margin-bottom: 4px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: radial-gradient(ellipse at 50% 70%, #fff6c8 0 20%, #ffc04a 45%, rgba(255,120,40,.6) 70%, transparent 72%);
+  opacity: 0; transform: scale(.3); transition: opacity .6s, transform .6s; filter: drop-shadow(0 0 10px #ffb347) drop-shadow(0 0 22px rgba(255,150,60,.7)); }
+[data-theme=carol] .candle.lit .flame { opacity: 1; transform: none; animation: flick 1.3s ease-in-out infinite alternate; }
+[data-theme=carol] .candle.lit .wax { box-shadow: 0 -20px 40px 4px rgba(255,180,80,.25); }
+[data-theme=carol] .candle:nth-child(2).lit .flame { animation-delay: .4s; } [data-theme=carol] .candle:nth-child(3).lit .flame { animation-delay: .8s; }
+@keyframes flick { 0% { transform: rotate(-3deg) scaleY(1); } 50% { transform: rotate(2deg) scaleY(1.12); } 100% { transform: rotate(-1deg) scaleY(.94); } }
+[data-theme=carol] .cname { position: absolute; bottom: -24px; white-space: nowrap; font: italic 400 .85rem 'IM Fell English', serif; color: var(--muted); }
+[data-theme=carol] .meter-label { margin-top: 30px; }
+body.haunt::after { content: ''; position: fixed; inset: 0; z-index: 80; pointer-events: none; background: radial-gradient(ellipse at 50% 40%, rgba(180,220,255,.25), rgba(0,0,0,.8)); animation: haunt 2.2s ease-in-out forwards; }
+body.haunt .candle .flame { animation: gutter .4s ease-in-out 4 !important; }
+@keyframes haunt { 0% { opacity: 0; } 25%, 60% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes gutter { 50% { transform: scale(.4) skewX(20deg); opacity: .4; } }
+[data-theme=carol] .countdown b { color: #f2d58e; font-family: 'IM Fell English SC'; font-weight: 400; }
+
+/* ================================================================
+   THEME 13 · MIRACLE ON 34TH STREET — 1947 store window & courtroom
+   ================================================================ */
+[data-theme=miracle] {
+  --bg: #2a0f12; --ink: #f8ecd4; --muted: #d4b9a0; --accent: #f3d9a4; --on-accent: #2a0f12; --accent2: #7fc28f; --on-accent2: #10261a;
+  --card: #f8ecd4; --chip: rgba(200,16,46,.1); --hover: rgba(0,0,0,.03); --line: rgba(80,30,30,.25); --field: #fffaf0;
+  --border: 0; --r: 6px; --btnr: 4px; --dlg: #f8ecd4; --toast: #c8102e; --warn: #c8102e;
+  --body: 'Nunito', system-ui, sans-serif; --h1: 400 clamp(2.3rem, 8vw, 4.5rem) 'DM Serif Display', serif; --h2: 400 clamp(1.8rem, 5vw, 2.6rem) 'DM Serif Display', serif; --h3: 400 1rem 'DM Serif Display', serif;
+  --title: #f3d9a4;
+  background: repeating-linear-gradient(90deg, rgba(200,16,46,.22) 0 40px, rgba(0,0,0,0) 40px 80px) 0 0/100% 46px no-repeat, radial-gradient(ellipse at 50% 30%, #5a1a20, #2a0f12 70%);
+  background-color: #2a0f12;
+}
+[data-theme=miracle] h1 { text-shadow: 0 3px 0 #7a1420, 0 0 30px rgba(243,217,164,.3); }
+/* cream "store window" cards with dark ink */
+[data-theme=miracle] .cat, [data-theme=miracle] .fact, [data-theme=miracle] .countdown div, [data-theme=miracle] .tally, [data-theme=miracle] .rsvp-form, [data-theme=miracle] .wx, [data-theme=miracle] .rsvps li, [data-theme=miracle] dialog, [data-theme=miracle] .jump a {
+  color: #3a1a1a; --ink: #3a1a1a; --muted: #7a5a4f; --accent: #c8102e; --on-accent: #fff; --accent2: #2e6b3f; --chip: rgba(200,16,46,.1); }
+[data-theme=miracle] .cat { box-shadow: 0 0 0 4px #c8102e, 0 0 0 6px #f3d9a4, 0 14px 30px rgba(0,0,0,.4); }
+[data-theme=miracle] .jump a.on { background: #c8102e; color: #fff; }
+[data-theme=miracle] .item .claim { background: #c8102e; border-radius: 3px; }
+[data-theme=miracle] .item .who::before { content: '✉ '; }
+[data-theme=miracle] .court { width: min(320px, 85%); overflow: visible; }
+[data-theme=miracle] .court .bench { fill: #5b3a22; } [data-theme=miracle] .court .bench-top { fill: #7a5232; }
+[data-theme=miracle] .court .seal { font: 700 8.5px 'Nunito', sans-serif; letter-spacing: .08em; fill: #f3d9a4; }
+[data-theme=miracle] .court .sack path:first-child { fill: #c9b38a; stroke: #8a7350; stroke-width: 1.5; }
+[data-theme=miracle] .court .sack .tie { fill: none; stroke: #8a7350; stroke-width: 2; }
+[data-theme=miracle] .court .sack text { font-size: 11px; fill: #5b3a22; }
+[data-theme=miracle] .court .verdict rect { fill: #c8102e; } [data-theme=miracle] .court .verdict text { font: 400 16px 'DM Serif Display', serif; fill: #fff; letter-spacing: .05em; }
+[data-theme=miracle] .court .verdict { animation: popin .6s cubic-bezier(.2, 1.8, .4, 1); transform-box: fill-box; transform-origin: center; }
+[data-theme=miracle] .meter.gavel svg { animation: boom .5s; }
+[data-theme=miracle] .countdown b { color: #c8102e; font-family: 'DM Serif Display'; font-weight: 400; }
+[data-theme=miracle] .shuffle { background: #f3d9a4; }

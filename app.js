@@ -1,5 +1,5 @@
 /* ---------- config ---------- */
-const SITE_VERSION = '2026.11.16.7'; // keep in sync with version.txt and the ?v= tags in index.html
+const SITE_VERSION = '2026.11.16.9'; // keep in sync with version.txt and the ?v= tags in index.html
 const SB_URL = 'https://jkgsytjstauxstiabhwz.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZ3N5dGpzdGF1eHN0aWFiaHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDI2ODAsImV4cCI6MjEwNjE3ODY4MH0.M8OzkHtXxaqGddAfmN26F2it1P-kIgttIUXWBHzgi1g';
 const PARTY = new Date(Date.UTC(2026, 11, 25, 16, 30)); // 11:30am Eastern
@@ -46,15 +46,15 @@ let theme, items = [], rsvps = [], votes = [];
 
 /* ---------- theme picking ---------- */
 // Random, but never one of the last few movies this phone has seen.
-// Remembers the last 5 (or fewer if there aren't enough themes to keep at least 2 choices).
+// Remembers the last 10 (or fewer if there aren't enough themes to keep at least 2 choices).
 const RECENT_KEY = 'xmasRecent';
 function recentThemes() { try { return JSON.parse(store.get(RECENT_KEY) || '[]').filter((id) => THEMES.some((t) => t.id === id)); } catch { return []; } }
-function rememberTheme(id) { const r = recentThemes().filter((x) => x !== id); r.push(id); store.set(RECENT_KEY, JSON.stringify(r.slice(-10))); store.set('xmasTheme', id); }
+function rememberTheme(id) { const r = recentThemes().filter((x) => x !== id); r.push(id); store.set(RECENT_KEY, JSON.stringify(r.slice(-20))); store.set('xmasTheme', id); }
 function pickTheme(forceNew) {
   const q = new URLSearchParams(location.search).get('theme');
   const forced = !forceNew && THEMES.find((x) => x.id === q);
   if (forced) { rememberTheme(forced.id); return forced; }
-  const gap = Math.max(1, Math.min(5, THEMES.length - 2));
+  const gap = Math.max(1, Math.min(10, THEMES.length - 2));
   const avoid = new Set(recentThemes().slice(-gap));
   if (theme) avoid.add(theme.id);
   let pool = THEMES.filter((t) => !avoid.has(t.id));
@@ -80,7 +80,7 @@ function applyTheme(t) {
 }
 
 /* ---------- showtime: curtains → marquee → reveal ---------- */
-const MQ_FONT = { griswold: "'Bungee Shade'", elf: "'Chewy'", grinch: "'Mountains of Christmas'", homealone: "'Permanent Marker'", polar: "'Rye'", wonderful: "'Limelight'", diehard: "'Anton'" };
+const MQ_FONT = { griswold: "'Bungee Shade'", elf: "'Chewy'", grinch: "'Mountains of Christmas'", homealone: "'Permanent Marker'", polar: "'Rye'", wonderful: "'Limelight'", diehard: "'Anton'", sadtree: "'Short Stack'", frosty: "'Fredoka'", hallmark: "'Great Vibes'", rudolph: "'Sniglet'", carol: "'IM Fell English SC'", miracle: "'DM Serif Display'" };
 let showing = false, skipShow = null;
 const wait = (ms) => new Promise((r) => { const t = setTimeout(r, ms); skipShow = () => { clearTimeout(t); r(); }; });
 
