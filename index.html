@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forcier Christmas Day</title>
+<meta name="description" content="Christmas Day at 56 Old Fort Ln — sign up to bring something!">
+<meta name="theme-color" content="#0b1530">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎄</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Chewy&family=Courier+Prime:wght@400;700&family=Kalam:wght@400;700&family=Limelight&family=Mountains+of+Christmas:wght@700&family=Nunito:wght@400;700;800&family=Permanent+Marker&family=Playfair+Display:ital,wght@0,700;1,400&family=Quicksand:wght@500;700&family=Rye&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-theme="griswold">
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="wipe" aria-hidden="true"><span id="wipeText"></span></div>
+
+<header class="hero">
+  <p class="feature">Now showing: <span id="movie"></span></p>
+  <h1 id="title" tabindex="0"></h1>
+  <p id="tagline" class="tagline"></p>
+
+  <div id="meter" class="meter" role="button" tabindex="0" aria-label="Sign-up progress"></div>
+
+  <div class="facts">
+    <button class="fact date" id="dateFact" type="button">
+      <span class="big">12/25</span><span class="small">Friday · doors 11:30am</span>
+    </button>
+    <div class="fact place">
+      <span class="big">56 Old Fort Ln</span><span class="small">Dunbarton, NH</span>
+      <a id="directions" class="btn ghost" target="_blank" rel="noopener">Directions ➜</a>
+    </div>
+  </div>
+
+  <div class="countdown" id="countdown" aria-live="off">
+    <div><b id="cdD">--</b><i>days</i></div>
+    <div><b id="cdH">--</b><i>hrs</i></div>
+    <div><b id="cdM">--</b><i>min</i></div>
+    <div><b id="cdS">--</b><i>sec</i></div>
+  </div>
+</header>
+
+<main>
+  <section class="block" id="menuBlock">
+    <div class="block-head">
+      <h2 id="menuTitle">The Spread</h2>
+      <p id="menuSub" class="sub"></p>
+    </div>
+    <div id="cats" class="cats"><p class="loading">Checking the list twice…</p></div>
+  </section>
+
+  <section class="block" id="rsvpBlock">
+    <div class="block-head">
+      <h2 id="rsvpTitle">Who's Coming</h2>
+      <p class="sub">Add your crew so we know how many plates (and how much stew).</p>
+    </div>
+    <div class="tally">
+      <div class="tally-row"><span>Adults</span><div class="bar"><i id="barA"></i></div><b id="numA">0</b><em>/ 14–16</em></div>
+      <div class="tally-row"><span>Kids</span><div class="bar"><i id="barK"></i></div><b id="numK">0</b><em>/ 16</em></div>
+    </div>
+    <ul id="rsvpList" class="rsvps"></ul>
+    <form id="rsvpForm" class="rsvp-form" autocomplete="off">
+      <input id="rFamily" maxlength="40" placeholder="Family / name (e.g. The Oestreichs)" required>
+      <div class="steppers">
+        <label class="stepper"><span>Adults</span><button type="button" data-step="rAdults:-1">−</button><output id="rAdults">2</output><button type="button" data-step="rAdults:1">+</button></label>
+        <label class="stepper"><span>Kids</span><button type="button" data-step="rKids:-1">−</button><output id="rKids">0</output><button type="button" data-step="rKids:1">+</button></label>
+      </div>
+      <input id="rNote" maxlength="140" placeholder="Note (optional): arriving late, bringing the dog…">
+      <button class="btn" type="submit" id="rSubmit">We're coming!</button>
+    </form>
+  </section>
+
+  <section class="block" id="walkBlock">
+    <div class="block-head">
+      <h2>The Family Walk</h2>
+      <p class="sub">Weather permitting, after present 🎁 time.</p>
+    </div>
+    <div id="weather" class="weather"><p class="loading">Asking the weather elves…</p></div>
+  </section>
+</main>
+
+<footer>
+  <p id="footLine"></p>
+  <p class="psst">psst… this page hides 3 secrets 🤫</p>
+</footer>
+
+<button id="shuffle" class="shuffle" type="button" aria-label="Switch to a different Christmas movie theme">
+  <span class="reel">🎞️</span><span class="lbl">New movie</span>
+</button>
+
+<dialog id="dlg">
+  <form method="dialog" id="dlgForm">
+    <h3 id="dlgTitle"></h3>
+    <div id="dlgBody"></div>
+    <div class="dlg-actions" id="dlgActions"></div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="sleigh" class="sleigh" aria-hidden="true">🦌🦌🦌🛷🎅</div>
+<div id="paintcan" class="paintcan" aria-hidden="true"><i></i><span>🪣</span></div>
+
+<script src="themes.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
