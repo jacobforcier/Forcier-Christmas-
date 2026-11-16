@@ -8,6 +8,7 @@ Sign-up site for Christmas Day: 12/25 @ 11:30am, 56 Old Fort Ln, Dunbarton, NH.
 - Add to Calendar (`christmas.ics` for Apple/Outlook with a day-before reminder, or Google Calendar)
 - No theme repeats within 10 views (per device)
 - Theme gadgets build up from zero on every visit (tap to replay); one-time "every dish is covered" celebration
+- Extras (extras.js): secrets tracker (7 secrets), shake for a snow globe, rare falling treasures to catch, Director's Cut (hold 🎞️), 12 Days banners (Dec 13–24), Christmas Eve Santa tracker, Christmas-morning gift wrap, ugly sweater mode
 - Sticky jump bar (Food · RSVP · Walk, plus Debate in the Die Hard theme)
 - Live countdown, directions button, and walk forecast (unlocks ~16 days out, via Open-Meteo)
 - Sign-ups are stored in Supabase (`xmas_items`, `xmas_rsvps`) and refresh automatically every few seconds

@@ -1,5 +1,6 @@
 /* ---------- config ---------- */
-const SITE_VERSION = '2026.11.16.11'; // keep in sync with version.txt and the ?v= tags in index.html
+const secret = (id) => window.secretFound && window.secretFound(id);
+const SITE_VERSION = '2026.11.16.13'; // keep in sync with version.txt and the ?v= tags in index.html
 const SB_URL = 'https://jkgsytjstauxstiabhwz.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZ3N5dGpzdGF1eHN0aWFiaHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDI2ODAsImV4cCI6MjEwNjE3ODY4MH0.M8OzkHtXxaqGddAfmN26F2it1P-kIgttIUXWBHzgi1g';
 const PARTY = new Date(Date.UTC(2026, 11, 25, 16, 30)); // 11:30am Eastern
@@ -171,7 +172,7 @@ async function showtime(next, after) {
 }
 $('stage').addEventListener('click', () => skipShow && skipShow());
 
-$('shuffle').addEventListener('click', () => showtime(pickTheme(true)));
+$('shuffle').addEventListener('click', () => { if (window.suppressShuffle) { window.suppressShuffle = false; return; } showtime(pickTheme(true)); });
 
 /* ---------- data ---------- */
 async function load() {
@@ -559,7 +560,7 @@ function ding() { [1046, 2093, 2637, 3136].forEach((f, i) => tone(f, 0, 2.2 - i 
 /* ---------- particles ---------- */
 const fx = (() => {
   const c = $('fx'), x = c.getContext('2d');
-  let W, H, dpr, flakes = [], bits = [], cfg = { kind: 'flake', colors: ['#fff'], count: 60 }, extra = 0;
+  let W, H, dpr, flakes = [], bits = [], swirl = [], cfg = { kind: 'flake', colors: ['#fff'], count: 60 }, extra = 0;
   function size() {
     dpr = Math.min(devicePixelRatio || 1, 2);
     W = c.width = innerWidth * dpr; H = c.height = innerHeight * dpr;
@@ -590,6 +591,13 @@ const fx = (() => {
       if (f.y > H + 10) Object.assign(f, mk(true));
       if (f.x > W + 10) f.x = -10; if (f.x < -10) f.x = W + 10;
       draw(f);
+    }
+    for (let i = swirl.length - 1; i >= 0; i--) {
+      const q = swirl[i];
+      if (q.w > 0.004) { q.th += q.w; q.w *= 0.986; q.r += (q.r0 - q.r) * 0.02; q.x = W / 2 + Math.cos(q.th) * q.r; q.y = H * .45 + Math.sin(q.th) * q.r * .8; }
+      else { q.vy = (q.vy || 0) + 0.01 * dpr; q.y += q.vy; q.x += Math.sin(t / 900 + q.ph) * .3 * dpr; q.a -= 0.0035; }
+      if (q.a <= 0 || q.y > H + 10) { swirl.splice(i, 1); continue; }
+      const rr = q.r; q.r = q.size; draw(q); q.r = rr;
     }
     for (let i = bits.length - 1; i >= 0; i--) {
       const b = bits[i];
@@ -623,13 +631,22 @@ const fx = (() => {
     for (let i = 0; i < 2; i++) bits.push({ x: (px + (Math.random() - .5) * 10) * dpr, y: (py + (Math.random() - .5) * 8) * dpr, vx: (-Math.random() * 1.2 - .3) * dpr, vy: (Math.random() - .3) * .6 * dpr,
       g: .015, fade: .016, r: (Math.random() * 1.6 + .8) * dpr, rot: 0, vr: 0, a: 1, col: cols[Math.floor(Math.random() * cols.length)] });
   }
-  return { setup, burstAt, blizzard, sparkle };
+  function globe() {
+    if (reduced) return;
+    const R = Math.min(W, H) * .55;
+    for (let i = 0; i < 320; i++) {
+      const r0 = Math.sqrt(Math.random()) * R;
+      swirl.push({ th: Math.random() * 6.283, w: 0.05 + Math.random() * 0.05, r: r0 * .3, r0, x: W / 2, y: H / 2, ph: Math.random() * 6.28,
+        size: (Math.random() * 2.2 + 1) * dpr, a: Math.random() * .4 + .6, col: '#ffffff', rot: 0 });
+    }
+  }
+  return { setup, burstAt, blizzard, sparkle, globe };
 })();
 const burst = (x, y, n) => fx.burstAt(x, y, n);
 
 /* ---------- easter eggs ---------- */
 // 1: the progress gadget does a movie gag
-const tapMeter = () => { if (meterAnim) return; audio(); playMeter({ sound: true, then: () => theme.gag($('meter')) }); };
+const tapMeter = () => { if (meterAnim) return; audio(); playMeter({ sound: true, then: () => { theme.gag($('meter')); secret('gag'); } }); };
 $('meter').addEventListener('click', tapMeter);
 $('meter').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tapMeter(); } });
 
@@ -638,7 +655,7 @@ let sleighFlying = false;
 function sleighBells() { for (let i = 0; i < 14; i++) tone(2600 + Math.random() * 900, i * 0.07 + Math.random() * .03, .18, .018, 'sine'); }
 function flySleigh() {
   if (sleighFlying || reduced) { if (reduced) toast('🎅 Ho ho ho! He’s checking the sign-up list twice.'); return; }
-  sleighFlying = true;
+  sleighFlying = true; secret('sleigh');
   const el = $('sleigh'), w = el.offsetWidth || 340, h = w * 110 / 410;
   const vw = innerWidth, vh = innerHeight, dur = 4200;
   const y0 = vh * .42, y1 = vh * .1;
@@ -676,7 +693,7 @@ addEventListener('keydown', (e) => {
 function snowDay() {
   fx.blizzard(); jingle();
   document.body.classList.add('snowday');
-  toast('❄️ SNOW DAY! Secret found — you’re officially on the nice list.');
+  toast('❄️ SNOW DAY! You’re officially on the nice list.'); secret('snowday');
   setTimeout(() => document.body.classList.remove('snowday'), 9000);
 }
 
