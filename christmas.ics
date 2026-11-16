@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Forcier Christmas//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:forcier-christmas-2026@jacobforcier.github.io
+DTSTAMP:20261116T000000Z
+DTSTART:20261225T163000Z
+DTEND:20261225T230000Z
+SUMMARY:🎄 Forcier Family Christmas
+LOCATION:56 Old Fort Ln\, Dunbarton\, NH
+DESCRIPTION:Brunch at 11:30\, presents\, family walk (weather permitting)\, then beef stew. Sign-ups: https://jacobforcier.github.io/Forcier-Christmas-/
+URL:https://jacobforcier.github.io/Forcier-Christmas-/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Christmas at the Forciers tomorrow! Check what you signed up to bring.
+TRIGGER:-P1D
+END:VALARM
+END:VEVENT
+END:VCALENDAR

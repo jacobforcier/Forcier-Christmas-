@@ -36,9 +36,10 @@
   <div id="meter" class="meter" role="button" tabindex="0" aria-label="Sign-up progress"></div>
 
   <div class="facts">
-    <button class="fact date" id="dateFact" type="button">
-      <span class="big">12/25</span><span class="small">Friday · doors 11:30am</span>
-    </button>
+    <div class="fact date">
+      <button class="big date-btn" id="dateFact" type="button">12/25</button><span class="small">Friday · doors 11:30am</span>
+      <button id="calBtn" class="btn ghost" type="button">📅 Add to calendar</button>
+    </div>
     <div class="fact place">
       <span class="big">56 Old Fort Ln</span><span class="small">Dunbarton, NH</span>
       <a id="directions" class="btn ghost" target="_blank" rel="noopener">Directions ➜</a>
@@ -81,6 +82,14 @@
       <input id="rNote" maxlength="140" placeholder="Note (optional): arriving late, bringing the dog…">
       <button class="btn" type="submit" id="rSubmit">We're coming!</button>
     </form>
+  </section>
+
+  <section class="block" id="tvBlock">
+    <div class="block-head">
+      <h2>Pick the Christmas Day Movie</h2>
+      <p class="sub" id="tvSub">Vote for your favorite theme. On Christmas Day, the winner is what everyone sees.</p>
+    </div>
+    <ol id="tvList" class="tv-list"></ol>
   </section>
 
   <section class="block" id="pollBlock">

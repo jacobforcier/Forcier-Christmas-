@@ -31,7 +31,7 @@ function table(name) {
     remove: (filter) => run('DELETE', filter),
   };
 }
-const T_ITEMS = table('xmas_items'), T_RSVP = table('xmas_rsvps'), T_VOTES = table('xmas_votes');
+const T_ITEMS = table('xmas_items'), T_RSVP = table('xmas_rsvps'), T_VOTES = table('xmas_votes'), T_TV = table('xmas_theme_votes');
 const byId = (id) => `id=eq.${encodeURIComponent(id)}`;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -41,7 +41,11 @@ const store = {
 };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-let theme, items = [], rsvps = [], votes = [];
+let theme, items = [], rsvps = [], votes = [], tvVotes = [];
+const XMAS_START = Date.UTC(2026, 11, 25, 5), XMAS_END = Date.UTC(2026, 11, 26, 5); // midnight to midnight Eastern
+const votingOpen = () => Date.now() < XMAS_START;
+const isXmasDay = () => Date.now() >= XMAS_START && Date.now() < XMAS_END;
+let winnerShown = false;
 
 /* ---------- theme picking ---------- */
 function pickTheme(forceNew) {
@@ -57,7 +61,7 @@ function pickTheme(forceNew) {
 function applyTheme(t) {
   theme = t;
   document.body.dataset.theme = t.id;
-  $('movie').textContent = t.movie;
+  $('movie').textContent = t.movie + (winnerShown && t.id === winnerId() ? ' · 🏆 the family\u2019s pick' : '');
   $('title').textContent = t.title;
   $('tagline').textContent = t.tagline;
   $('menuTitle').textContent = t.menuTitle;
@@ -79,10 +83,11 @@ $('shuffle').addEventListener('click', () => {
 
 /* ---------- data ---------- */
 async function load() {
-  const [a, b, c] = await Promise.all([
+  const [a, b, c, d] = await Promise.all([
     T_ITEMS.list('sort,created_at'),
     T_RSVP.list('created_at'),
     T_VOTES.list('updated_at', 'vote'),
+    T_TV.list('updated_at', 'theme'),
   ]);
   if (a.error || b.error) {
     $('cats').innerHTML = '<p class="loading">Couldn’t reach the North Pole server. Try refreshing in a sec. 📡</p>';
@@ -90,6 +95,7 @@ async function load() {
   }
   items = a.data; rsvps = b.data;
   if (c.data) votes = c.data.map((v) => v.vote);
+  if (d.data) tvVotes = d.data.map((v) => v.theme);
   renderAll();
 }
 let reloadT;
@@ -109,6 +115,7 @@ function renderAll() {
   renderItems();
   renderRsvps();
   renderPoll();
+  renderTV();
 }
 
 function renderItems() {
@@ -272,6 +279,76 @@ $('rsvpList').addEventListener('click', async (e) => {
     toast(`${r.family} removed.`);
   } else return;
   load();
+});
+
+/* ---------- pick the Christmas Day movie ---------- */
+function tvTally() {
+  const n = Object.fromEntries(THEMES.map((t) => [t.id, 0]));
+  tvVotes.forEach((id) => { if (id in n) n[id]++; });
+  return THEMES.map((t, i) => ({ t, n: n[t.id], i })).sort((a, b) => b.n - a.n || a.i - b.i);
+}
+function winnerId() { const top = tvTally()[0]; return top && top.n ? top.t.id : null; }
+
+function renderTV() {
+  const list = $('tvList'); if (!list || !theme) return;
+  const rows = tvTally(), max = Math.max(1, rows[0].n), mine = store.get('xmasTvVote'), open = votingOpen();
+  // FLIP: remember where each row was so reorders glide
+  const before = {};
+  list.querySelectorAll('li[data-tv]').forEach((li) => { before[li.dataset.tv] = li.getBoundingClientRect().top; });
+  list.innerHTML = rows.map(({ t, n }, rank) => `<li data-tv="${t.id}" class="${t.id === mine ? 'mine' : ''} ${t.id === theme.id ? 'now' : ''} ${rank === 0 && n ? 'lead' : ''}">
+    <span class="tv-rank">${rank === 0 && n ? '🏆' : rank + 1}</span>
+    <span class="tv-poster" style="--s1:${t.swatch[0]};--s2:${t.swatch[1]};--s3:${t.swatch[2]}">${t.emoji}</span>
+    <div class="tv-main"><b>${esc(t.name)}</b>
+      <div class="tv-bar"><i style="width:${(n / max) * 100}%"></i></div>
+      <span class="tv-meta">${n} vote${n === 1 ? '' : 's'}${t.id === theme.id ? ' · now showing' : ''}</span></div>
+    <div class="tv-acts">
+      ${t.id === theme.id ? '' : `<button type="button" class="mini" data-preview="${t.id}">preview</button>`}
+      ${open ? `<button type="button" class="tv-vote" data-tvvote="${t.id}">${t.id === mine ? '✓ your pick' : 'vote'}</button>` : ''}
+    </div></li>`).join('');
+  list.querySelectorAll('li[data-tv]').forEach((li) => {
+    const was = before[li.dataset.tv]; if (was === undefined || reduced) return;
+    const dy = was - li.getBoundingClientRect().top; if (!dy) return;
+    li.style.transform = `translateY(${dy}px)`; li.style.transition = 'none';
+    requestAnimationFrame(() => requestAnimationFrame(() => { li.style.transition = 'transform .6s cubic-bezier(.2, 1.2, .4, 1)'; li.style.transform = ''; }));
+  });
+  const w = THEMES.find((t) => t.id === winnerId());
+  $('tvSub').textContent = open
+    ? (mine ? 'You can change your vote until Christmas Eve at midnight.' : 'Vote for your favorite theme. On Christmas Day, the winner is what everyone sees.')
+    : w ? `Voting's closed! ${w.name} won with ${rows[0].n} vote${rows[0].n === 1 ? '' : 's'}. 🏆` : 'Voting’s closed.';
+}
+
+$('tvList').addEventListener('click', async (e) => {
+  const pv = e.target.closest('[data-preview]');
+  if (pv) { const t = THEMES.find((x) => x.id === pv.dataset.preview); store.set('xmasTheme', t.id); applyTheme(t); window.scrollTo({ top: 0, behavior: 'smooth' }); toast(`🎬 Previewing ${t.name}`); return; }
+  const b = e.target.closest('[data-tvvote]'); if (!b) return;
+  if (!votingOpen()) return toast('Voting’s closed. Merry Christmas! 🎄');
+  const id = b.dataset.tvvote, prev = store.get('xmasTvVote'), t = THEMES.find((x) => x.id === id);
+  if (prev === id) return toast(`${t.emoji} ${t.name} is already your pick!`);
+  const i = prev ? tvVotes.indexOf(prev) : -1;
+  if (i > -1) tvVotes[i] = id; else tvVotes.push(id);
+  store.set('xmasTvVote', id);
+  renderTV();
+  burst(e.clientX, e.clientY, 50);
+  toast(`${t.emoji} ${prev ? 'Switched your vote to' : 'Voted for'} ${t.name}!`);
+  const { error } = await T_TV.upsert({ voter_key: voterKey, theme: id, updated_at: new Date() }, 'voter_key');
+  if (error) toast('That vote didn’t save. Try again?');
+  reloadSoon();
+});
+
+/* ---------- add to calendar ---------- */
+const GCAL = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+  + '&text=' + encodeURIComponent('🎄 Forcier Family Christmas')
+  + '&dates=20261225T163000Z/20261225T230000Z'
+  + '&location=' + encodeURIComponent(ADDRESS)
+  + '&details=' + encodeURIComponent('Brunch at 11:30, presents, family walk (weather permitting), then beef stew.\nSign-ups: ' + location.origin + location.pathname);
+$('calBtn').addEventListener('click', () => {
+  const apple = `<a class="btn cal-opt" href="christmas.ics">🍎 Apple / Outlook Calendar</a>`;
+  const google = `<a class="btn cal-opt ${isApple ? 'ghost' : ''}" href="${GCAL}" target="_blank" rel="noopener">📆 Google Calendar</a>`;
+  openDialog('Add Christmas to your calendar',
+    `<p class="dlg-note">Friday 12/25, 11:30am at 56 Old Fort Ln.${isApple ? ' Includes a reminder the day before.' : ''}</p>
+     <div class="cal-opts">${isApple ? apple + google : google + apple.replace('btn cal-opt', 'btn cal-opt ghost')}</div>`,
+    [{ label: 'Close', value: null, cls: 'ghost' }]);
+  $('dlgBody').querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setTimeout(() => dlg.close(), 300)));
 });
 
 /* ---------- the great debate ---------- */
@@ -501,7 +578,18 @@ function snowDay() {
 }
 
 /* ---------- go ---------- */
-applyTheme(pickTheme(false));
+// On Christmas Day the family's pick is the default (a ?theme= link or the shuffle button still work)
+async function start() {
+  const forced = new URLSearchParams(location.search).get('theme');
+  if (isXmasDay() && !forced) {
+    const r = await Promise.race([T_TV.list('updated_at', 'theme'), new Promise((res) => setTimeout(() => res({}), 2500))]);
+    if (r.data) tvVotes = r.data.map((v) => v.theme);
+    const w = THEMES.find((t) => t.id === winnerId());
+    if (w) { winnerShown = true; return applyTheme(w); }
+  }
+  applyTheme(pickTheme(false));
+}
+start();
 tick();
 load();
 weather();

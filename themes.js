@@ -3,6 +3,7 @@
 const THEMES = [
   {
     id: 'griswold',
+    name: 'Christmas Vacation', emoji: '💡', swatch: ['#0b1530', '#ffcf3f', '#ff6b5a'],
     movie: 'a Christmas Vacation kind of night',
     title: 'The Fun, Old-Fashioned Family Christmas',
     tagline: 'Twenty-five thousand twinkle lights. A house full of family. Hopefully zero squirrels in the tree.',
@@ -49,6 +50,7 @@ const THEMES = [
   },
   {
     id: 'elf',
+    name: 'Elf', emoji: '🧝', swatch: ['#fff6e8', '#e2382f', '#1f9d55'],
     movie: 'an Elf kind of day',
     title: 'Sing Loud. Eat Louder.',
     tagline: 'The four main food groups: breakfast, snacks, stew, and paper plates.',
@@ -87,6 +89,7 @@ const THEMES = [
   },
   {
     id: 'grinch',
+    name: 'The Grinch', emoji: '💚', swatch: ['#0f3d2a', '#9be15d', '#ff4d57'],
     movie: 'a Grinchy Who-liday',
     title: 'Every Who Down in Dunbarton',
     tagline: 'Bring a dish and watch this heart grow three sizes.',
@@ -119,6 +122,7 @@ const THEMES = [
   },
   {
     id: 'homealone',
+    name: 'Home Alone', emoji: '🪤', swatch: ['#12407a', '#ffd84a', '#ff6a5a'],
     movie: 'a Home Alone kind of plan',
     title: 'Operation: Christmas Day',
     tagline: 'This house is protected by family. Here’s the battle plan — claim your position.',
@@ -154,6 +158,7 @@ const THEMES = [
   },
   {
     id: 'polar',
+    name: 'The Polar Express', emoji: '🚂', swatch: ['#241736', '#f5c542', '#f4e6c1'],
     movie: 'a Polar Express kind of night',
     title: 'All Aboard for Christmas Day',
     tagline: 'One ticket per dish. The train leaves for Dunbarton at 11:30 sharp.',
@@ -187,6 +192,7 @@ const THEMES = [
   },
   {
     id: 'wonderful',
+    name: 'It\u2019s a Wonderful Life', emoji: '🔔', swatch: ['#1b1b1b', '#ecebe6', '#8a8a8a'],
     movie: 'It’s a Wonderful Life (in glorious black & white)',
     title: 'It’s a Wonderful Christmas',
     tagline: 'Every time somebody claims a dish, an angel gets its wings.',
@@ -218,6 +224,7 @@ const THEMES = [
   },
   {
     id: 'diehard',
+    name: 'Die Hard', emoji: '🏢', swatch: ['#0d0d10', '#ff8a1f', '#ffcc33'],
     movie: 'a Die Hard Christmas (yes, it counts)',
     title: 'Welcome to the Party, Pal',
     tagline: 'Come out to Dunbarton, we’ll get together, have a few laughs.',
