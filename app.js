@@ -19,13 +19,19 @@ function table(name) {
     } catch (e) { return { data: null, error: e }; }
   };
   return {
-    list: (order) => run('GET', `select=*&order=${order}`),
+    list: (order, cols = '*') => run('GET', `select=${cols}&order=${order}`),
+    upsert: async (row, key) => {
+      try {
+        const r = await fetch(`${base}?on_conflict=${key}`, { method: 'POST', headers: { ...H, Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(row) });
+        return r.ok ? { error: null } : { error: r.status };
+      } catch (e) { return { error: e }; }
+    },
     insert: (row) => run('POST', '', row),
     update: (row, filter) => run('PATCH', filter, row),
     remove: (filter) => run('DELETE', filter),
   };
 }
-const T_ITEMS = table('xmas_items'), T_RSVP = table('xmas_rsvps');
+const T_ITEMS = table('xmas_items'), T_RSVP = table('xmas_rsvps'), T_VOTES = table('xmas_votes');
 const byId = (id) => `id=eq.${encodeURIComponent(id)}`;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -35,7 +41,7 @@ const store = {
 };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-let theme, items = [], rsvps = [];
+let theme, items = [], rsvps = [], votes = [];
 
 /* ---------- theme picking ---------- */
 function pickTheme(forceNew) {
@@ -73,15 +79,17 @@ $('shuffle').addEventListener('click', () => {
 
 /* ---------- data ---------- */
 async function load() {
-  const [a, b] = await Promise.all([
+  const [a, b, c] = await Promise.all([
     T_ITEMS.list('sort,created_at'),
     T_RSVP.list('created_at'),
+    T_VOTES.list('updated_at', 'vote'),
   ]);
   if (a.error || b.error) {
     $('cats').innerHTML = '<p class="loading">Couldn’t reach the North Pole server. Try refreshing in a sec. 📡</p>';
     return;
   }
   items = a.data; rsvps = b.data;
+  if (c.data) votes = c.data.map((v) => v.vote);
   renderAll();
 }
 let reloadT;
@@ -100,6 +108,7 @@ function renderAll() {
   theme.meter($('meter'), stats());
   renderItems();
   renderRsvps();
+  renderPoll();
 }
 
 function renderItems() {
@@ -264,6 +273,43 @@ $('rsvpList').addEventListener('click', async (e) => {
   } else return;
   load();
 });
+
+/* ---------- the great debate ---------- */
+const voterKey = (() => {
+  let k = store.get('xmasVoter');
+  if (!k) { k = 'v' + Math.random().toString(36).slice(2) + Date.now().toString(36); store.set('xmasVoter', k); }
+  return k;
+})();
+const myVote = () => { const v = store.get('xmasVote'); return v === null ? null : v === '1'; };
+
+function renderPoll() {
+  const yes = votes.filter(Boolean).length, no = votes.length - yes, total = votes.length;
+  const pct = total ? yes / total : 0.5;
+  $('pollYesN').textContent = yes; $('pollNoN').textContent = no;
+  $('pollYesBar').style.width = pct * 100 + '%';
+  $('pollKnot').style.left = pct * 100 + '%';
+  const mine = myVote();
+  document.querySelectorAll('.vote').forEach((b) => b.classList.toggle('mine', mine !== null && (b.dataset.vote === '1') === mine));
+  const p = Math.round(pct * 100);
+  $('pollVerdict').textContent = !total ? 'No votes yet. Somebody start the argument.'
+    : yes === no ? `Dead even at ${yes}–${no}. This will be settled over beef stew.`
+    : yes > no ? `${p}% say YES. The family has spoken${p >= 80 ? ', and it\u2019s not close' : ''}. 🎄`
+    : `${100 - p}% say NO?! Somebody needs to rewatch it. 🧨`;
+}
+
+document.querySelectorAll('.vote').forEach((b) => b.addEventListener('click', async (e) => {
+  const v = b.dataset.vote === '1', prev = myVote();
+  if (prev === v) return toast(v ? 'You already voted yes. Correct, by the way. 🎄' : 'Still a no? Bold. 🧨');
+  // optimistic update
+  if (prev === null) votes.push(v); else { const i = votes.indexOf(prev); if (i > -1) votes[i] = v; }
+  store.set('xmasVote', v ? '1' : '0');
+  renderPoll();
+  burst(e.clientX, e.clientY, 50);
+  toast(v ? (prev === null ? '🎄 Vote counted. Welcome to the party, pal!' : '🎄 Changed to YES. Good call.') : (prev === null ? '🧨 Vote counted. Bold take.' : '🧨 Switched to NO?! Okay…'));
+  const { error } = await T_VOTES.upsert({ voter_key: voterKey, vote: v, updated_at: new Date() }, 'voter_key');
+  if (error) toast('That vote didn\u2019t save. Try again?');
+  reloadSoon();
+}));
 
 /* ---------- countdown ---------- */
 function tick() {

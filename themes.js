@@ -216,4 +216,52 @@ const THEMES = [
       setTimeout(() => el.classList.remove('ring'), 1200);
     },
   },
+  {
+    id: 'diehard',
+    movie: 'a Die Hard Christmas (yes, it counts)',
+    title: 'Welcome to the Party, Pal',
+    tagline: 'Come out to Dunbarton, we’ll get together, have a few laughs.',
+    menuTitle: 'The Party Floor',
+    menuSub: 'Every claimed dish lights up another floor of the tower.',
+    cats: {
+      breakfast: ['Breakfast', 'Now I have a cinnamon roll. Ho-ho-ho.'],
+      snacks: ['Snacks', 'Twinkies not included'],
+      dinner: ['Dinner', 'Thirty floors of stew. Okay, one pot.'],
+      paper: ['Paper Goods', 'Supplies (no duct tape required)'],
+    },
+    claimBtn: 'Yippee-ki-yay',
+    open: 'Floor dark',
+    rsvpBtn: 'Welcome to the party!',
+    foot: 'Shoes REQUIRED for the walk. Make fists with your toes on your own time.',
+    particles: { kind: 'flake', colors: ['#ffffff', '#ffd2a1', '#ff9a3c'], count: 55 },
+    burst: ['#bfe6ff', '#ffffff', '#ff7a1a', '#ffcc33', '#8fd3ff'],
+    floors: 14,
+    meter(el, s) {
+      const F = this.floors, lit = Math.round(s.pct * F), done = s.pct >= 1;
+      let win = '';
+      for (let f = 0; f < F; f++) {
+        const y = 196 - f * 12.5, on = f < lit;
+        for (let w = 0; w < 6; w++) {
+          const flick = on && (f * 6 + w) % 7 === 3 ? ' flick' : '';
+          win += `<rect class="win${on ? ' on' : ''}${flick}" x="${236 + w * 21.5}" y="${y}" width="14" height="8" rx="1"/>`;
+        }
+      }
+      el.innerHTML = `<svg viewBox="0 0 600 230" class="tower">
+        <path class="sky2" d="M0 230 V170 h40 v-30 h30 v40 h26 v-62 h34 v52 h40 v-24 h32 v84 Z M600 230 V160 h-34 v-34 h-28 v54 h-30 v-72 h-36 v62 h-30 v60 Z"/>
+        <path class="bldg" d="M226 230 V20 L246 6 H350 L370 20 V230 Z"/>
+        <rect class="heli" x="268" y="2" width="60" height="6" rx="2"/>
+        ${win}
+        <text x="298" y="${done ? 17 : 16}" text-anchor="middle" class="roof ${done ? 'on' : ''}">${done ? 'PARTY’S ON' : '30TH FLOOR'}</text>
+        <circle class="beacon" cx="372" cy="16" r="3.5"/>
+      </svg>
+      <p class="meter-label"><b>${lit}</b> of ${F} floors lit · ${s.claimed}/${s.total} dishes claimed${done ? ' · <em>WELCOME TO THE PARTY</em>' : ''}</p>`;
+    },
+    gag(el) {
+      document.body.classList.remove('boom'); void document.body.offsetWidth; document.body.classList.add('boom');
+      const r = el.getBoundingClientRect();
+      burst(r.left + r.width / 2, r.top + r.height * 0.3, 110);
+      toast('💥 Welcome to the party, pal!');
+      setTimeout(() => document.body.classList.remove('boom'), 700);
+    },
+  },
 ];

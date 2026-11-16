@@ -20,7 +20,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎄</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Chewy&family=Courier+Prime:wght@400;700&family=Kalam:wght@400;700&family=Limelight&family=Mountains+of+Christmas:wght@700&family=Nunito:wght@400;700;800&family=Permanent+Marker&family=Playfair+Display:ital,wght@0,700;1,400&family=Quicksand:wght@500;700&family=Rye&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bungee+Shade&family=Chewy&family=Courier+Prime:wght@400;700&family=Kalam:wght@400;700&family=Limelight&family=Mountains+of+Christmas:wght@700&family=Nunito:wght@400;700;800&family=Permanent+Marker&family=Playfair+Display:ital,wght@0,700;1,400&family=Quicksand:wght@500;700&family=Rye&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body data-theme="griswold">
@@ -81,6 +81,22 @@
       <input id="rNote" maxlength="140" placeholder="Note (optional): arriving late, bringing the dog…">
       <button class="btn" type="submit" id="rSubmit">We're coming!</button>
     </form>
+  </section>
+
+  <section class="block" id="pollBlock">
+    <div class="block-head">
+      <h2>The Great Debate</h2>
+      <p class="sub" id="pollSub">Settle it once and for all. One vote per phone, and you can change your mind.</p>
+    </div>
+    <div class="poll">
+      <p class="poll-q">Is <b>Die Hard</b> a Christmas movie?</p>
+      <div class="poll-btns">
+        <button type="button" class="vote yes" data-vote="1"><span class="v-ico">🎄</span><span class="v-lbl">Yes, obviously</span><span class="v-n" id="pollYesN">0</span></button>
+        <button type="button" class="vote no" data-vote="0"><span class="v-ico">🧨</span><span class="v-lbl">No, it's an action movie</span><span class="v-n" id="pollNoN">0</span></button>
+      </div>
+      <div class="tug" aria-hidden="true"><i id="pollYesBar"></i><span class="knot" id="pollKnot">🪢</span></div>
+      <p class="poll-verdict" id="pollVerdict">No votes yet. Somebody start the argument.</p>
+    </div>
   </section>
 
   <section class="block" id="walkBlock">

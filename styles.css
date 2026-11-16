@@ -113,6 +113,27 @@ h2 { margin: 0; font: var(--h2); line-height: 1.1; color: var(--title, var(--ink
 .wx.no .verdict { color: var(--warn, #e5484d); }
 @keyframes bob { 50% { transform: translateY(-6px) rotate(-4deg); } }
 
+/* the great debate */
+.poll { background: var(--card); border: var(--border); border-radius: var(--r); padding: 18px; text-align: center; }
+.poll-q { margin: 0 0 14px; font: var(--h3); font-size: 1.5rem; line-height: 1.2; }
+.poll-q b { color: var(--accent2); }
+.poll-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.vote { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 10px; border-radius: var(--r);
+  border: 2px solid var(--line); background: var(--field); font-weight: 800; transition: transform .15s, border-color .2s, box-shadow .2s; }
+.vote:hover { transform: translateY(-2px); }
+.vote:active { transform: scale(.96); }
+.vote .v-ico { font-size: 2rem; line-height: 1; }
+.vote .v-lbl { font-size: .95rem; line-height: 1.2; }
+.vote .v-n { font: var(--h3); font-size: 1.8rem; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.vote.mine { border-color: var(--accent); box-shadow: 0 0 0 3px var(--chip); }
+.vote.mine::after { content: 'your vote'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); padding: 1px 8px; border-radius: 999px;
+  background: var(--accent); color: var(--on-accent); font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.tug { position: relative; height: 14px; margin: 22px 6px 8px; border-radius: 999px; background: var(--warn, #e5484d); }
+.tug i { display: block; height: 100%; width: 50%; border-radius: 999px 0 0 999px; background: #2fbf71; transition: width 1s cubic-bezier(.2, 1.4, .4, 1); }
+.tug .knot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.6rem; transition: left 1s cubic-bezier(.2, 1.4, .4, 1); }
+.poll-verdict { margin: 10px 0 0; color: var(--muted); font-weight: 700; }
+@media (max-width: 680px) { .vote .v-lbl { font-size: .85rem; } }
+
 footer { text-align: center; padding-bottom: 110px; color: var(--muted); }
 footer p { margin: 4px 0; }
 .psst { font-size: .78rem; opacity: .7; }
@@ -360,3 +381,41 @@ body.snowday h1 { animation: shiver .15s linear infinite; }
 [data-theme=wonderful] .countdown b { font-family: 'Limelight'; font-weight: 400; }
 [data-theme=wonderful] .countdown div { border-radius: 50%; aspect-ratio: 1; display: grid; place-content: center; min-width: 74px; }
 [data-theme=wonderful] .shuffle { background: #ecebe6; }
+
+/* ================================================================
+   THEME 7 · DIE HARD — office tower at night, action-poster type
+   ================================================================ */
+[data-theme=diehard] {
+  --bg: #0d0d10; --ink: #f2efe9; --muted: #a8a49c; --accent: #ff8a1f; --on-accent: #140800; --accent2: #ffcc33; --on-accent2: #140800;
+  --card: rgba(255,255,255,.04); --chip: rgba(255,138,31,.14); --hover: rgba(255,138,31,.07); --line: rgba(255,255,255,.18); --field: rgba(0,0,0,.4);
+  --border: 1px solid rgba(255,255,255,.12); --r: 3px; --btnr: 3px; --dlg: #17171c; --toast: #ff8a1f; --toast-ink: #140800; --warn: #e5484d;
+  --body: 'Nunito', system-ui, sans-serif; --h1: 400 clamp(2.6rem, 10vw, 5.6rem) 'Anton', Impact, sans-serif; --h2: 400 clamp(1.9rem, 6vw, 2.9rem) 'Anton', Impact, sans-serif; --h3: 400 1rem 'Anton', Impact, sans-serif;
+  background: radial-gradient(900px 380px at 50% 105%, rgba(255,110,20,.28), transparent 70%), linear-gradient(#0b0b12, #121219 55%, #1b130e);
+  background-color: #1b130e;
+}
+[data-theme=diehard] h1 { text-transform: uppercase; letter-spacing: .01em; line-height: .95;
+  background: linear-gradient(#fff3d6 20%, #ffb347 55%, #ff5a1a 90%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 4px 0 #3a1200) drop-shadow(0 0 24px rgba(255,120,30,.35)); }
+[data-theme=diehard] .feature { color: var(--muted); }
+[data-theme=diehard] h2, [data-theme=diehard] .cat h3, [data-theme=diehard] .fact .big, [data-theme=diehard] .poll-q { text-transform: uppercase; letter-spacing: .02em; }
+[data-theme=diehard] .cat { border-top: 3px solid var(--accent); background: linear-gradient(rgba(255,138,31,.06), rgba(255,255,255,.02)); }
+[data-theme=diehard] .item .claim { border-radius: 2px; text-transform: uppercase; letter-spacing: .04em; font-family: 'Anton', Impact, sans-serif; font-weight: 400; font-size: .82rem; }
+[data-theme=diehard] .item .who { color: var(--accent2); }
+[data-theme=diehard] .countdown b { font-family: 'Anton', Impact, sans-serif; font-weight: 400; color: var(--accent); }
+[data-theme=diehard] .tower { width: 100%; max-width: 560px; overflow: visible; }
+[data-theme=diehard] .tower .sky2 { fill: #191920; }
+[data-theme=diehard] .tower .bldg { fill: #23252e; stroke: #3a3d4a; stroke-width: 1.5; }
+[data-theme=diehard] .tower .heli { fill: #3a3d4a; }
+[data-theme=diehard] .tower .win { fill: #14151a; transition: fill .5s; }
+[data-theme=diehard] .tower .win.on { fill: #ffc56b; filter: drop-shadow(0 0 3px rgba(255,190,90,.8)); }
+[data-theme=diehard] .tower .win.flick { animation: winflick 3.5s infinite; }
+[data-theme=diehard] .tower .roof { font: 400 9px 'Anton', Impact, sans-serif; letter-spacing: .12em; fill: #6c6f7d; }
+[data-theme=diehard] .tower .roof.on { fill: #ffcc33; animation: twinkle 1s infinite; }
+[data-theme=diehard] .tower .beacon { fill: #ff2a2a; animation: beacon 1.6s infinite; }
+@keyframes winflick { 0%, 90%, 100% { opacity: 1; } 92% { opacity: .25; } 95% { opacity: .9; } 97% { opacity: .3; } }
+@keyframes beacon { 0%, 60%, 100% { opacity: .2; } 70% { opacity: 1; filter: drop-shadow(0 0 6px #ff2a2a); } }
+body.boom { animation: boom .6s cubic-bezier(.36, .07, .19, .97); }
+body.boom::after { content: ''; position: fixed; inset: 0; z-index: 80; pointer-events: none; background: #fff3d6; animation: flash .5s forwards; }
+@keyframes boom { 10%, 90% { transform: translate(-2px, 1px); } 20%, 80% { transform: translate(4px, -2px); } 30%, 50%, 70% { transform: translate(-6px, 3px); } 40%, 60% { transform: translate(6px, -3px); } }
+@keyframes flash { from { opacity: .7; } to { opacity: 0; } }
+[data-theme=diehard] .shuffle { background: var(--accent); color: var(--on-accent); }

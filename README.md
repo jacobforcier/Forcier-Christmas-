@@ -2,8 +2,9 @@
 
 Sign-up site for Christmas Day: 12/25 @ 11:30am, 56 Old Fort Ln, Dunbarton, NH.
 
-- Each visit picks a new Christmas-movie theme (🎞️ button to shuffle, or `?theme=griswold|elf|grinch|homealone|polar|wonderful`)
+- Each visit picks a new Christmas-movie theme (🎞️ button to shuffle, or `?theme=griswold|elf|grinch|homealone|polar|wonderful|diehard`)
 - Claim, change, release, or add dishes; RSVP with adult/kid counts
+- "Is Die Hard a Christmas movie?" live family poll (`xmas_votes`, one vote per device)
 - Live countdown, directions button, and walk forecast (unlocks ~16 days out, via Open-Meteo)
 - Sign-ups are stored in Supabase (`xmas_items`, `xmas_rsvps`) and refresh automatically every few seconds
 - 3 hidden secrets 🤫
