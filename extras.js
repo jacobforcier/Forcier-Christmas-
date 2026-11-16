@@ -53,7 +53,7 @@ function allSecrets() {
 }
 $('secretsBtn').addEventListener('click', () => {
   const f = foundSecrets();
-  const needMotion = !f.includes('globe') && typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function' && !motionOn;
+  const needMotion = !f.includes('globe') && motionNeedsPermission && !motionGranted && 'ontouchend' in window;
   openDialog(`🤫 Secrets: ${SECRETS.filter((s) => f.includes(s.id)).length} of ${SECRETS.length}`,
     `<ul class="secret-list">${SECRETS.map((s) => f.includes(s.id)
       ? `<li class="got">✅ <b>${s.name}</b></li>`
@@ -62,14 +62,14 @@ $('secretsBtn').addEventListener('click', () => {
     [{ label: 'Close', value: null, cls: 'ghost' }]);
   const mb = $('motionBtn');
   if (mb) mb.addEventListener('click', async () => {
-    try { if ((await DeviceMotionEvent.requestPermission()) === 'granted') { listenMotion(); mb.textContent = '📳 Ready. Now shake!'; mb.disabled = true; } }
+    try { if ((await DeviceMotionEvent.requestPermission()) === 'granted') { motionGranted = true; mb.textContent = '📳 Ready. Now shake!'; mb.disabled = true; } }
     catch { mb.textContent = 'Motion not available'; }
   });
 });
 renderSecrets();
 
 /* ---------- 2. shake → snow globe ---------- */
-let globeBusy = false, motionOn = false;
+let globeBusy = false, motionOn = false, motionGranted = false;
 function snowGlobe() {
   if (globeBusy) return;
   globeBusy = true;
@@ -81,18 +81,40 @@ function snowGlobe() {
 }
 function listenMotion() {
   if (motionOn) return; motionOn = true;
-  let last = null, hits = [];
+  // Count distinct jolts: a spike in movement, then a short gap before the next one counts.
+  let last = null, peaks = [], lastPeak = 0;
   addEventListener('devicemotion', (e) => {
-    const a = e.accelerationIncludingGravity; if (!a || a.x == null) return;
-    if (last) {
-      const d = Math.abs(a.x - last.x) + Math.abs(a.y - last.y) + Math.abs(a.z - last.z);
-      const now = Date.now();
-      if (d > 22) { hits = hits.filter((t) => now - t < 900); hits.push(now); if (hits.length >= 3) { hits = []; snowGlobe(); } }
+    const now = Date.now();
+    let mag;
+    const a = e.acceleration;                               // movement without gravity (most phones)
+    if (a && a.x != null) mag = Math.hypot(a.x, a.y, a.z);
+    else {                                                  // fallback: change in raw reading
+      const g = e.accelerationIncludingGravity; if (!g || g.x == null) return;
+      mag = last ? Math.hypot(g.x - last.x, g.y - last.y, g.z - last.z) : 0;
+      last = { x: g.x, y: g.y, z: g.z };
     }
-    last = { x: a.x, y: a.y, z: a.z };
+    if (mag > 11 && now - lastPeak > 120) {
+      lastPeak = now;
+      peaks = peaks.filter((t) => now - t < 1300); peaks.push(now);
+      if (peaks.length >= 3) { peaks = []; snowGlobe(); }
+    }
   });
 }
-if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission !== 'function') listenMotion(); // Android etc.
+const motionNeedsPermission = typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function';
+if (typeof DeviceMotionEvent !== 'undefined') listenMotion(); // harmless before permission: iPhones just send nothing until allowed
+// iPhone: motion needs a one-time "Allow" that can only be asked right after a tap. Ask on the first tap anywhere
+// (not while someone is typing in a box), once per visit.
+if (motionNeedsPermission) {
+  const ask = (e) => {
+    if (e.target.closest && e.target.closest('input, textarea, dialog')) return;
+    document.removeEventListener('touchend', ask, true);
+    let asked = null; try { asked = sessionStorage.getItem('xmasMotionAsked'); } catch {}
+    if (asked) return;
+    try { sessionStorage.setItem('xmasMotionAsked', '1'); } catch {}
+    DeviceMotionEvent.requestPermission().then((r) => { if (r === 'granted') motionGranted = true; }).catch(() => {});
+  };
+  document.addEventListener('touchend', ask, true);
+}
 // computers: a quick side-to-side mouse wiggle counts as a shake
 (() => {
   let lx = null, dir = 0, flips = [];

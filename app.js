@@ -1,6 +1,6 @@
 /* ---------- config ---------- */
 const secret = (id) => window.secretFound && window.secretFound(id);
-const SITE_VERSION = '2026.11.16.13'; // keep in sync with version.txt and the ?v= tags in index.html
+const SITE_VERSION = '2026.11.16.14'; // keep in sync with version.txt and the ?v= tags in index.html
 const SB_URL = 'https://jkgsytjstauxstiabhwz.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZ3N5dGpzdGF1eHN0aWFiaHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDI2ODAsImV4cCI6MjEwNjE3ODY4MH0.M8OzkHtXxaqGddAfmN26F2it1P-kIgttIUXWBHzgi1g';
 const PARTY = new Date(Date.UTC(2026, 11, 25, 16, 30)); // 11:30am Eastern
