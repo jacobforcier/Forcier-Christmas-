@@ -1,5 +1,5 @@
 /* ---------- config ---------- */
-const SITE_VERSION = '2026.11.16.10'; // keep in sync with version.txt and the ?v= tags in index.html
+const SITE_VERSION = '2026.11.16.11'; // keep in sync with version.txt and the ?v= tags in index.html
 const SB_URL = 'https://jkgsytjstauxstiabhwz.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZ3N5dGpzdGF1eHN0aWFiaHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDI2ODAsImV4cCI6MjEwNjE3ODY4MH0.M8OzkHtXxaqGddAfmN26F2it1P-kIgttIUXWBHzgi1g';
 const PARTY = new Date(Date.UTC(2026, 11, 25, 16, 30)); // 11:30am Eastern
@@ -593,7 +593,7 @@ const fx = (() => {
     }
     for (let i = bits.length - 1; i >= 0; i--) {
       const b = bits[i];
-      b.vy += 0.18 * dpr; b.x += b.vx; b.y += b.vy; b.rot += b.vr; b.a -= 0.008;
+      b.vy += (b.g ?? 0.18) * dpr; b.x += b.vx; b.y += b.vy; b.rot += b.vr; b.a -= b.fade || 0.008;
       if (b.a <= 0 || b.y > H + 20) { bits.splice(i, 1); continue; }
       draw(b);
     }
@@ -617,7 +617,13 @@ const fx = (() => {
   }
   addEventListener('resize', () => { size(); setup(cfg); });
   size(); requestAnimationFrame(frame);
-  return { setup, burstAt, blizzard };
+  function sparkle(px, py) {
+    if (reduced) return;
+    const cols = ['#fff6cf', '#ffd76a', '#ffffff', '#ffe9a8'];
+    for (let i = 0; i < 2; i++) bits.push({ x: (px + (Math.random() - .5) * 10) * dpr, y: (py + (Math.random() - .5) * 8) * dpr, vx: (-Math.random() * 1.2 - .3) * dpr, vy: (Math.random() - .3) * .6 * dpr,
+      g: .015, fade: .016, r: (Math.random() * 1.6 + .8) * dpr, rot: 0, vr: 0, a: 1, col: cols[Math.floor(Math.random() * cols.length)] });
+  }
+  return { setup, burstAt, blizzard, sparkle };
 })();
 const burst = (x, y, n) => fx.burstAt(x, y, n);
 
@@ -627,11 +633,33 @@ const tapMeter = () => { if (meterAnim) return; audio(); playMeter({ sound: true
 $('meter').addEventListener('click', tapMeter);
 $('meter').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tapMeter(); } });
 
-// 2: tap the date → sleigh flyover
-$('dateFact').addEventListener('click', () => {
-  const s = $('sleigh'); s.classList.remove('fly'); void s.offsetWidth; s.classList.add('fly');
-  setTimeout(() => toast('🎅 Ho ho ho! He’s checking the sign-up list twice.'), 900);
-});
+// 2: tap the date → Santa's sleigh flyover
+let sleighFlying = false;
+function sleighBells() { for (let i = 0; i < 14; i++) tone(2600 + Math.random() * 900, i * 0.07 + Math.random() * .03, .18, .018, 'sine'); }
+function flySleigh() {
+  if (sleighFlying || reduced) { if (reduced) toast('🎅 Ho ho ho! He’s checking the sign-up list twice.'); return; }
+  sleighFlying = true;
+  const el = $('sleigh'), w = el.offsetWidth || 340, h = w * 110 / 410;
+  const vw = innerWidth, vh = innerHeight, dur = 4200;
+  const y0 = vh * .42, y1 = vh * .1;
+  const pos = (t) => [-w * 1.1 + (vw + w * 2.2) * t, y0 + (y1 - y0) * t - Math.sin(Math.PI * t) * vh * .14 + Math.sin(t * 14) * 6];
+  el.classList.add('flying'); sleighBells();
+  const t0 = performance.now();
+  let lastBells = 0;
+  const frame = (now) => {
+    const t = Math.min(1, (now - t0) / dur);
+    const [x, y] = pos(t), [x2, y2] = pos(Math.min(1, t + .01));
+    const ang = Math.atan2(y2 - y, x2 - x) * 180 / Math.PI;
+    el.style.transform = `translate(${x}px, ${y}px) rotate(${ang}deg)`;
+    fx.sparkle(x + w * .05, y + h * .82);
+    if (now - lastBells > 1400) { lastBells = now; if (t > .1) sleighBells(); }
+    if (t < 1) requestAnimationFrame(frame);
+    else { el.classList.remove('flying'); el.style.transform = ''; sleighFlying = false; }
+  };
+  requestAnimationFrame(frame);
+  setTimeout(() => toast('🎅 Ho ho ho! He’s checking the sign-up list twice.'), 1600);
+}
+$('dateFact').addEventListener('click', () => { audio(); flySleigh(); });
 
 // 3: tap the title 5 times (or Konami code) → snow day
 let taps = 0, tapT;

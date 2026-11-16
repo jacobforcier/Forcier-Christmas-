@@ -248,9 +248,35 @@ dialog h3 { margin: 0 0 12px; font: var(--h3); font-size: 1.5rem; line-height: 1
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
 /* sleigh + paint can */
-.sleigh { position: fixed; z-index: 70; top: 18%; left: 0; font-size: 2.6rem; white-space: nowrap; pointer-events: none; transform: translateX(-110%); }
-.sleigh.fly { animation: fly 3.4s ease-in forwards; }
-@keyframes fly { 0% { transform: translate(-110%, 40px) rotate(-6deg); } 50% { transform: translate(40vw, -30px) rotate(-10deg); } 100% { transform: translate(110vw, -120px) rotate(-14deg); } }
+.sleigh2 { position: fixed; z-index: 70; left: 0; top: 0; width: min(380px, 78vw); pointer-events: none; visibility: hidden; will-change: transform;
+  filter: drop-shadow(0 0 6px rgba(255,240,200,.55)) drop-shadow(0 6px 10px rgba(0,0,0,.35)); }
+.sleigh2.flying { visibility: visible; }
+.sleigh2 svg { display: block; width: 100%; overflow: visible; }
+.sleigh2 .body, .sleigh2 .neck, .sleigh2 .head, .sleigh2 .ear { fill: #8a5a36; }
+.sleigh2 .snout { fill: #b98457; } .sleigh2 .nose { fill: #2a1a10; } .sleigh2 .eye, .sleigh2 .eye2 { fill: #1a1a1a; }
+.sleigh2 .tail { fill: #f3e6d0; }
+.sleigh2 .antler { stroke: #d8b48a; stroke-width: 2.2; fill: none; stroke-linecap: round; }
+.sleigh2 .legs path { stroke: #6f4527; stroke-width: 3.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.sleigh2 .collar { stroke: #c8102e; stroke-width: 3; fill: none; stroke-linecap: round; } .sleigh2 .bell { fill: #f2c230; }
+.sleigh2 .rein { stroke: #c9a24a; stroke-width: 1.2; fill: none; opacity: .85; }
+.sleigh2 .runner, .sleigh2 .strut { stroke: #f2c230; stroke-width: 3.2; fill: none; stroke-linecap: round; }
+.sleigh2 .body2 { fill: #c8102e; } .sleigh2 .trim, .sleigh2 .swirl { stroke: #f2c230; stroke-width: 2.6; fill: none; stroke-linecap: round; }
+.sleigh2 .sack ellipse { fill: #7a5230; } .sleigh2 .g1 { fill: #2e8b57; } .sleigh2 .g2 { fill: #3d6fa8; } .sleigh2 .sack .tie { stroke: #f2c230; stroke-width: 2; fill: none; }
+.sleigh2 .coat, .sleigh2 .hat { fill: #d0212f; } .sleigh2 .belt { stroke: #1a1a1a; stroke-width: 3.5; } .sleigh2 .buckle { fill: none; stroke: #f2c230; stroke-width: 1.4; }
+.sleigh2 .face { fill: #f2c6a0; } .sleigh2 .cheek { fill: #f08a8a; opacity: .7; }
+.sleigh2 .beard, .sleigh2 .brim, .sleigh2 .pom { fill: #fbf7ef; }
+.sleigh2 .arm { stroke: #d0212f; stroke-width: 5; fill: none; stroke-linecap: round; } .sleigh2 .mitt { fill: #fbf7ef; }
+.sleigh2.flying .legs { transform-box: fill-box; animation: gallop .42s ease-in-out infinite alternate; animation-delay: var(--d); }
+.sleigh2.flying .legs.front { transform-origin: 0% 0%; }
+.sleigh2.flying .legs.back { transform-origin: 100% 0%; animation-name: gallop-b; }
+@keyframes gallop { from { transform: rotate(-18deg); } to { transform: rotate(16deg); } }
+@keyframes gallop-b { from { transform: rotate(16deg); } to { transform: rotate(-14deg); } }
+.sleigh2.flying .deer { transform-box: fill-box; animation: bound .42s ease-in-out infinite alternate; animation-delay: var(--d); }
+@keyframes bound { to { transform: translateY(-3px); } }
+.sleigh2.flying .wave { transform-box: fill-box; transform-origin: 0% 100%; animation: wave2 .5s ease-in-out infinite alternate; }
+@keyframes wave2 { from { transform: rotate(-10deg); } to { transform: rotate(18deg); } }
+.sleigh2.flying .sled { transform-box: fill-box; transform-origin: 80% 50%; animation: sledbob .84s ease-in-out infinite alternate; }
+@keyframes sledbob { to { transform: rotate(-2.5deg) translateY(2px); } }
 .paintcan { position: fixed; z-index: 70; top: 0; left: 50%; pointer-events: none; transform-origin: top center; transform: translateY(-110%); }
 .paintcan i { display: block; width: 2px; height: 46vh; margin: 0 auto; background: #ddd; }
 .paintcan span { display: block; font-size: 3.4rem; margin-top: -10px; }
