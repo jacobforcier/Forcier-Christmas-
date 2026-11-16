@@ -1,5 +1,5 @@
 /* ---------- config ---------- */
-const SITE_VERSION = '2026.11.16.4'; // keep in sync with version.txt and the ?v= tags in index.html
+const SITE_VERSION = '2026.11.16.5'; // keep in sync with version.txt and the ?v= tags in index.html
 const SB_URL = 'https://jkgsytjstauxstiabhwz.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZ3N5dGpzdGF1eHN0aWFiaHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDI2ODAsImV4cCI6MjEwNjE3ODY4MH0.M8OzkHtXxaqGddAfmN26F2it1P-kIgttIUXWBHzgi1g';
 const PARTY = new Date(Date.UTC(2026, 11, 25, 16, 30)); // 11:30am Eastern
@@ -74,13 +74,45 @@ function applyTheme(t) {
   renderAll();
 }
 
-$('shuffle').addEventListener('click', () => {
-  const next = pickTheme(true);
-  const w = document.querySelector('.wipe');
-  $('wipeText').textContent = '🎬 ' + next.movie;
-  w.classList.remove('go'); void w.offsetWidth; w.classList.add('go');
-  setTimeout(() => { applyTheme(next); window.scrollTo({ top: 0, behavior: 'smooth' }); }, 550);
-});
+/* ---------- showtime: curtains → marquee → reveal ---------- */
+const MQ_FONT = { griswold: "'Bungee Shade'", elf: "'Chewy'", grinch: "'Mountains of Christmas'", homealone: "'Permanent Marker'", polar: "'Rye'", wonderful: "'Limelight'", diehard: "'Anton'" };
+let showing = false, skipShow = null;
+const wait = (ms) => new Promise((r) => { const t = setTimeout(r, ms); skipShow = () => { clearTimeout(t); r(); }; });
+
+async function showtime(next, after) {
+  if (showing) return;
+  if (reduced) { applyTheme(next); window.scrollTo(0, 0); after && after(); return; }
+  showing = true;
+  const st = $('stage'), mq = $('marquee');
+  mq.style.setProperty('--mq-bg', next.swatch[0]);
+  mq.style.setProperty('--mq-ink', next.swatch[1]);
+  mq.style.setProperty('--mq-edge', next.swatch[2]);
+  mq.style.setProperty('--mq-font', MQ_FONT[next.id] || 'inherit');
+  $('mqEmoji').textContent = next.emoji;
+  $('mqTitle').textContent = next.name;
+  $('mqSub').textContent = next.title;
+  document.body.classList.add('showtime');
+  st.className = 'stage on';
+  whoosh();
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  st.classList.add('shut');                       // curtains swing closed
+  await wait(950);
+  applyTheme(next); window.scrollTo({ top: 0, behavior: 'instant' }); // swap the movie behind the curtain
+  st.classList.add('lit'); fanfare();            // marquee + spotlight
+  setTimeout(() => burst(innerWidth / 2, innerHeight * 0.38, 90), 250);
+  await wait(2300);                               // hold: time to read it
+  st.classList.remove('lit'); st.classList.add('leave');
+  await wait(300);
+  st.classList.remove('shut'); whoosh();          // curtains part
+  await wait(1150);
+  st.className = 'stage';
+  document.body.classList.remove('showtime');
+  showing = false; skipShow = null;
+  after && after();
+}
+$('stage').addEventListener('click', () => skipShow && skipShow());
+
+$('shuffle').addEventListener('click', () => showtime(pickTheme(true)));
 
 /* ---------- data ---------- */
 async function load() {
@@ -320,7 +352,7 @@ function renderTV() {
 
 $('tvList').addEventListener('click', async (e) => {
   const pv = e.target.closest('[data-preview]');
-  if (pv) { const t = THEMES.find((x) => x.id === pv.dataset.preview); store.set('xmasTheme', t.id); applyTheme(t); window.scrollTo({ top: 0, behavior: 'smooth' }); toast(`🎬 Previewing ${t.name}`); return; }
+  if (pv) { const t = THEMES.find((x) => x.id === pv.dataset.preview); store.set('xmasTheme', t.id); showtime(t, () => toast(`🎬 Previewing ${t.name}`)); return; }
   const b = e.target.closest('[data-tvvote]'); if (!b) return;
   if (!votingOpen()) return toast('Voting’s closed. Merry Christmas! 🎄');
   const id = b.dataset.tvvote, prev = store.get('xmasTvVote'), t = THEMES.find((x) => x.id === id);
@@ -481,6 +513,17 @@ function tone(f, t0, dur, vol = 0.08, type = 'sine') {
   o.start(a.currentTime + t0); o.stop(a.currentTime + t0 + dur + 0.05);
 }
 function jingle() { [659, 659, 659, 0, 659, 659, 659, 0, 659, 784, 523, 587, 659].forEach((f, i) => f && tone(f, i * 0.11, 0.25, 0.05, 'triangle')); }
+function fanfare() { [[523, 0], [659, .1], [784, .2], [1047, .32], [784, .5], [1047, .62]].forEach(([f, t], i) => tone(f, t, i > 3 ? .5 : .18, .045, 'triangle')); }
+function whoosh() {
+  const a = audio(); if (!a) return;
+  try {
+    const len = a.sampleRate * 0.9, buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.sin((i / len) * Math.PI);
+    const src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    f.type = 'bandpass'; f.frequency.setValueAtTime(300, a.currentTime); f.frequency.linearRampToValueAtTime(900, a.currentTime + .9); f.Q.value = .8;
+    g.gain.value = .05; src.buffer = buf; src.connect(f).connect(g).connect(a.destination); src.start();
+  } catch {}
+}
 function ding() { [1046, 2093, 2637, 3136].forEach((f, i) => tone(f, 0, 2.2 - i * 0.4, 0.07 / (i + 1))); }
 
 /* ---------- particles ---------- */
