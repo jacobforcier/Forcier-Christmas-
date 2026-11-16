@@ -4,8 +4,8 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const PARTY = new Date(Date.UTC(2026, 11, 25, 16, 30)); // 11:30am Eastern
 const ADDRESS = '56 Old Fort Ln, Dunbarton, NH';
 const LAT = 43.1015, LON = -71.6167;
-const CAT_ORDER = ['breakfast', 'snacks', 'dinner', 'paper'];
-const CAT_ICON = { breakfast: '🥞', snacks: '🍪', dinner: '🍲', paper: '🍽️' };
+const CAT_ORDER = ['breakfast', 'snacks', 'dinner', 'dessert', 'paper'];
+const CAT_ICON = { breakfast: '🥞', snacks: '🍪', dinner: '🍲', dessert: '🥧', paper: '🍽️' };
 
 /* tiny Supabase REST client — no library needed */
 function table(name) {
@@ -126,7 +126,7 @@ function renderItems() {
     const open = list.filter((i) => !i.claimed_by).length;
     return `<article class="cat cat-${c}">
       <header><span class="ico">${CAT_ICON[c]}</span><div><h3>${name}</h3><p>${esc(kick)}</p></div>
-      <span class="count ${open ? '' : 'done'}">${open ? open + ' open' : 'all set ✓'}</span></header>
+      <span class="count ${open || !list.length ? '' : 'done'}">${!list.length ? 'add one!' : open ? open + ' open' : 'all set ✓'}</span></header>
       <ul>${list.map((i) => `<li class="item ${i.claimed_by ? 'claimed' : 'open'}">
         <button type="button" data-id="${i.id}">
           <span class="nm">${esc(i.name)}</span><span class="dots"></span>

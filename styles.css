@@ -454,3 +454,6 @@ body.boom::after { content: ''; position: fixed; inset: 0; z-index: 80; pointer-
 /* the Die Hard debate only appears in the Die Hard theme */
 #pollBlock { display: none; }
 [data-theme=diehard] #pollBlock { display: block; }
+
+/* odd number of categories: let the last card span the full row on desktop */
+.cat:last-child:nth-child(odd) { grid-column: 1 / -1; }
