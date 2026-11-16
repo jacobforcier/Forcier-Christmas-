@@ -352,6 +352,7 @@ const THEMES = [
     foot: 'Don’t cry. He’ll be back again someday. Like leftovers.',
     particles: { kind: 'flake', colors: ['#ffffff', '#a9d3f5', '#ffffff'], count: 95 },
     burst: ['#ffffff', '#e8483c', '#ff9f1c', '#13385c', '#a9d3f5'],
+    reset() { this._st = 0; },
     steps: ['a pile of snow', 'bottom snowball', 'middle snowball', 'his head', 'coal & a carrot', 'a scarf', 'THE HAT'],
     meter(el, s) {
       const st = s.pct >= 1 ? 6 : Math.floor(s.pct * 6), prev = this._st ?? st;
@@ -537,6 +538,64 @@ const THEMES = [
       el.classList.remove('gavel'); void el.offsetWidth; el.classList.add('gavel');
       toast('⚖️ Order in the court! Santa Claus is real.');
       setTimeout(() => el.classList.remove('gavel'), 900);
+    },
+  },
+  {
+    id: 'puppets',
+    name: 'Muppet Christmas Carol', emoji: '🐸', swatch: ['#2b1630', '#ffcc4d', '#7bd389'],
+    movie: 'a Muppet Christmas Carol kind of night',
+    title: 'A Felt-Covered Christmas Carol',
+    tagline: 'Starring the whole family, with a full chorus of puppets. Light the lamp, not the rat!',
+    menuTitle: 'The Cratchits’ Table',
+    menuSub: 'Every dish you claim brings another puppet out to sing.',
+    cats: {
+      breakfast: ['Breakfast', 'Christmas morning, before the narrator wakes up'],
+      snacks: ['Snacks', 'Cheese for the rats (and everyone else)'],
+      dinner: ['Dinner', 'Stew. Not a turkey the size of a boy.'],
+      dessert: ['Dessert', 'Christmas pudding, sung in three-part harmony'],
+      paper: ['Paper Goods', 'Counting-house supplies (no coal for the fire)'],
+    },
+    claimBtn: 'Sing it!',
+    open: 'No puppet yet',
+    rsvpBtn: 'Thankful for the family!',
+    foot: 'Light the lamp, not the rat. Merry Christmas! 🎭',
+    particles: { kind: 'flake', colors: ['#ffffff', '#ffe7a8', '#d8c4ff'], count: 70 },
+    burst: ['#ff7a45', '#7bd389', '#5aa9ff', '#ffcc4d', '#c77dff', '#ff5d8f'],
+    cols: ['#ff7a45', '#7bd389', '#5aa9ff', '#ffcc4d', '#c77dff', '#ff5d8f', '#4dd0c4', '#b0805a', '#ff9f1c', '#9ad14b', '#e05a5a', '#6c8cff'],
+    reset() { this._n = 0; },
+    meter(el, s) {
+      const max = 12, n = Math.round(s.pct * max), prev = this._n ?? n, full = s.pct >= 1;
+      this._n = n;
+      const spots = [];
+      for (let i = 0; i < 6; i++) spots.push([58 + i * 41, 104, 17]);   // back row
+      for (let i = 0; i < 6; i++) spots.push([38 + i * 49, 128, 20]);   // front row
+      const order = [6, 1, 9, 4, 0, 11, 3, 7, 2, 10, 5, 8];          // pop up all over the stage, not left-to-right
+      let pups = '';
+      order.slice(0, n).sort((a, b) => a - b).forEach((idx) => {
+        const [x, y, r] = spots[idx], c = this.cols[idx], k = order.indexOf(idx);
+        const fresh = k >= prev ? ' pop' : '';
+        const tuft = idx % 3 === 0 ? `<path d="M${x - 6} ${y - r + 2} l-3 -9 M${x} ${y - r} l0 -10 M${x + 6} ${y - r + 2} l3 -9" class="tuft" stroke="${c}"/>` : '';
+        const nose = idx % 4 === 1 ? `<circle cx="${x}" cy="${y + 2}" r="${r * .28}" fill="#ff5d5d"/>` : '';
+        pups += `<g class="pup${fresh}" style="--d:${(idx * .13) % .9}s">${tuft}
+          <circle cx="${x}" cy="${y}" r="${r}" fill="${c}" class="fuzz"/>
+          <ellipse class="mouth" cx="${x}" cy="${y + r * .45}" rx="${r * .5}" ry="${r * .2}"/>
+          <g class="eyes"><circle cx="${x - r * .36}" cy="${y - r * .3}" r="${r * .3}" fill="#fff"/><circle cx="${x + r * .36}" cy="${y - r * .3}" r="${r * .3}" fill="#fff"/>
+          <circle class="pupil" cx="${x - r * .32 + (idx % 3) - 1}" cy="${y - r * .22}" r="${r * .13}"/><circle class="pupil" cx="${x + r * .4 + (idx % 2)}" cy="${y - r * .26}" r="${r * .13}"/></g>${nose}</g>`;
+      });
+      const notes = full ? '<g class="notes"><text x="70" y="60">♪</text><text x="160" y="46">♫</text><text x="250" y="58">♪</text></g>' : '';
+      el.innerHTML = `<svg viewBox="0 0 320 200" class="stage-svg ${full ? 'sing' : ''}">
+        <rect x="14" y="20" width="292" height="150" rx="6" class="backdrop"/>
+        <path d="M14 20 H306 V40 Q290 52 270 40 Q250 52 230 40 Q210 52 190 40 Q170 52 150 40 Q130 52 110 40 Q90 52 70 40 Q50 52 30 40 Q22 46 14 40 Z" class="valance2"/>
+        ${pups}${notes}
+        <path d="M6 140 H314 V186 H6 Z" class="front"/><path d="M6 140 H314" class="front-trim"/>
+        <path d="M6 14 V186 M314 14 V186" class="posts"/>
+      </svg>
+      <p class="meter-label"><b>${n}</b> of ${max} puppets on stage · ${s.claimed}/${s.total} dishes claimed${full ? ' · <em>FULL CHORUS!</em>' : ''}</p>`;
+    },
+    gag(el) {
+      el.classList.remove('flail'); void el.offsetWidth; el.classList.add('flail');
+      toast('💡 Light the lamp, not the rat! Light the lamp, not the rat!');
+      setTimeout(() => el.classList.remove('flail'), 1500);
     },
   },
 ];

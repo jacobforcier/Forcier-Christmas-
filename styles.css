@@ -689,3 +689,57 @@ body.haunt .candle .flame { animation: gutter .4s ease-in-out 4 !important; }
 [data-theme=miracle] .meter.gavel svg { animation: boom .5s; }
 [data-theme=miracle] .countdown b { color: #c8102e; font-family: 'DM Serif Display'; font-weight: 400; }
 [data-theme=miracle] .shuffle { background: #f3d9a4; }
+
+/* full-house celebration banner */
+.fullhouse { position: fixed; z-index: 96; left: 50%; top: max(14px, env(safe-area-inset-top)); width: min(460px, calc(100% - 32px)); display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; border-radius: 18px; background: var(--accent); color: var(--on-accent); box-shadow: 0 18px 50px rgba(0,0,0,.4); cursor: pointer;
+  transform: translate(-50%, -160%) rotate(-3deg); transition: transform .7s cubic-bezier(.2, 1.6, .4, 1); }
+.fullhouse.show { transform: translate(-50%, 0) rotate(0); }
+.fullhouse .fh-ico { font-size: 2.2rem; animation: bob 1.2s ease-in-out infinite; }
+.fullhouse b { display: block; font: var(--h3); font-size: 1.25rem; line-height: 1.15; }
+.fullhouse span { font-size: .9rem; font-weight: 700; opacity: .9; }
+.meter { position: relative; }
+.meter::after { content: '↻ tap'; position: absolute; right: 0; top: 0; font-size: .7rem; font-weight: 800; letter-spacing: .08em; color: var(--muted); opacity: .55; }
+
+/* ================================================================
+   THEME 14 · MUPPET CHRISTMAS CAROL — felt puppet theater
+   ================================================================ */
+[data-theme=puppets] {
+  --bg: #2b1630; --ink: #fff4e0; --muted: #d8bfd9; --accent: #ffcc4d; --on-accent: #2b1630; --accent2: #7bd389; --on-accent2: #14301d;
+  --card: #3b2142; --chip: rgba(255,204,77,.15); --hover: rgba(255,255,255,.05); --line: rgba(255,244,224,.22); --field: rgba(0,0,0,.25);
+  --border: 2px dashed rgba(255,204,77,.55); --r: 16px; --dlg: #3b2142; --toast: #ff7a45; --warn: #ff7a7a;
+  --body: 'Nunito', system-ui, sans-serif; --h1: 400 clamp(2.4rem, 9vw, 4.8rem) 'Luckiest Guy', cursive; --h2: 400 clamp(1.8rem, 5.2vw, 2.7rem) 'Luckiest Guy', cursive; --h3: 400 1rem 'Luckiest Guy', cursive;
+  --title: #ffcc4d;
+  background: repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 3px, transparent 3px 14px), radial-gradient(ellipse at 50% 0%, #5a2a5e, #2b1630 65%);
+  background-color: #2b1630;
+}
+[data-theme=puppets] h1 { letter-spacing: .02em; text-shadow: 3px 3px 0 #ff7a45, 6px 6px 0 rgba(0,0,0,.35); transform: rotate(-2deg); }
+/* felt + stitching on cards */
+[data-theme=puppets] .cat, [data-theme=puppets] .fact, [data-theme=puppets] .tally, [data-theme=puppets] .rsvp-form, [data-theme=puppets] .wx, [data-theme=puppets] .countdown div {
+  background-image: radial-gradient(rgba(255,255,255,.04) 1px, transparent 1.5px); background-size: 5px 5px; outline: 4px solid #3b2142; outline-offset: -8px; }
+[data-theme=puppets] .cat h3 { font-size: 1.45rem; letter-spacing: .02em; }
+[data-theme=puppets] .item .claim { background: #ff7a45; color: #fff; font-family: 'Luckiest Guy'; font-weight: 400; letter-spacing: .04em; }
+[data-theme=puppets] .item .who { color: #7bd389; }
+[data-theme=puppets] .item .who::before { content: '👀 '; }
+[data-theme=puppets] .countdown b { font-family: 'Luckiest Guy'; font-weight: 400; color: #ffcc4d; }
+[data-theme=puppets] .stage-svg { width: min(340px, 90%); overflow: visible; }
+[data-theme=puppets] .stage-svg .backdrop { fill: #1d0f22; }
+[data-theme=puppets] .stage-svg .valance2 { fill: #b3192a; }
+[data-theme=puppets] .stage-svg .front { fill: #b3192a; }
+[data-theme=puppets] .stage-svg .front-trim, [data-theme=puppets] .stage-svg .posts { stroke: #ffcc4d; stroke-width: 4; fill: none; }
+[data-theme=puppets] .stage-svg .fuzz { stroke: rgba(0,0,0,.18); stroke-width: 3; stroke-dasharray: 1 3; }
+[data-theme=puppets] .stage-svg .tuft { stroke-width: 3; stroke-linecap: round; fill: none; }
+[data-theme=puppets] .stage-svg .mouth { fill: #3a0f12; transform-box: fill-box; transform-origin: center; }
+[data-theme=puppets] .stage-svg .pupil { fill: #111; transform-box: fill-box; animation: googly 2.6s var(--d) ease-in-out infinite; }
+@keyframes googly { 0%, 100% { transform: translate(0, 0); } 30% { transform: translate(1.5px, 1px); } 60% { transform: translate(-1.5px, .5px); } }
+[data-theme=puppets] .stage-svg .pup { transform-box: fill-box; transform-origin: 50% 100%; animation: sway 3s var(--d) ease-in-out infinite; }
+[data-theme=puppets] .stage-svg .pup.pop { animation: pupup .55s cubic-bezier(.2, 1.7, .4, 1) backwards, sway 3s .55s ease-in-out infinite; }
+@keyframes pupup { from { transform: translateY(40px); } }
+@keyframes sway { 50% { transform: rotate(4deg); } }
+[data-theme=puppets] .stage-svg.sing .mouth { animation: sing .32s var(--d) ease-in-out infinite alternate; }
+@keyframes sing { to { transform: scaleY(2.6); } }
+[data-theme=puppets] .stage-svg .notes text { font-size: 22px; fill: #ffcc4d; animation: note 2s ease-in-out infinite; }
+[data-theme=puppets] .stage-svg .notes text:nth-child(2) { animation-delay: .6s; } [data-theme=puppets] .stage-svg .notes text:nth-child(3) { animation-delay: 1.2s; }
+@keyframes note { 0% { opacity: 0; transform: translateY(10px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-24px); } }
+[data-theme=puppets] .meter.flail .pup { animation: flail .18s ease-in-out 7 alternate !important; }
+@keyframes flail { from { transform: translateY(0) rotate(-12deg); } to { transform: translateY(-12px) rotate(12deg); } }

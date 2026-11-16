@@ -1,5 +1,5 @@
 /* ---------- config ---------- */
-const SITE_VERSION = '2026.11.16.9'; // keep in sync with version.txt and the ?v= tags in index.html
+const SITE_VERSION = '2026.11.16.10'; // keep in sync with version.txt and the ?v= tags in index.html
 const SB_URL = 'https://jkgsytjstauxstiabhwz.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZ3N5dGpzdGF1eHN0aWFiaHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDI2ODAsImV4cCI6MjEwNjE3ODY4MH0.M8OzkHtXxaqGddAfmN26F2it1P-kIgttIUXWBHzgi1g';
 const PARTY = new Date(Date.UTC(2026, 11, 25, 16, 30)); // 11:30am Eastern
@@ -42,7 +42,7 @@ const store = {
 };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-let theme, items = [], rsvps = [], votes = [];
+let theme, items = [], rsvps = [], votes = [], loadedOnce = false;
 
 /* ---------- theme picking ---------- */
 // Random, but never one of the last few movies this phone has seen.
@@ -64,8 +64,9 @@ function pickTheme(forceNew) {
   return t;
 }
 
-function applyTheme(t) {
+function applyTheme(t, meterMode = 'play') {
   theme = t;
+  cancelMeter();
   document.body.dataset.theme = t.id;
   $('movie').textContent = t.movie;
   $('title').textContent = t.title;
@@ -77,10 +78,62 @@ function applyTheme(t) {
   document.querySelector('meta[name=theme-color]').content = getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#0b1530';
   fx.setup(t.particles);
   renderAll();
+  if (meterMode === 'play') playMeter();
+  else if (meterMode === 'empty') drawMeterAt(0);
+}
+
+/* ---------- gadget build-up: every visit plays the progression from zero ---------- */
+let meterAnim = null;
+function cancelMeter() { if (meterAnim) { clearTimeout(meterAnim.t); meterAnim = null; } }
+function drawMeterAt(n) {
+  const s = stats();
+  theme.meter($('meter'), { total: s.total, claimed: n, pct: s.total ? n / s.total : 0 });
+}
+function playMeter(opts = {}) {
+  cancelMeter();
+  const target = stats().claimed;
+  if (!stats().total || !target || reduced) { theme.meter($('meter'), stats()); opts.then && opts.then(); checkFullHouse(); return; }
+  if (theme.reset) theme.reset();
+  const dur = Math.min(2600, Math.max(1100, target * 130));
+  const ease = (x) => 1 - Math.pow(1 - x, 2.2);           // quick start, settles at the end
+  let i = 0;
+  const run = { t: null };
+  meterAnim = run;
+  const step = () => {
+    if (meterAnim !== run) return;
+    drawMeterAt(i);
+    if (opts.sound && i > 0) tone(440 + i * 28, 0, .12, .025, 'triangle');
+    if (i >= target) {
+      meterAnim = null;
+      theme.meter($('meter'), stats());                  // land on the live number
+      opts.then && opts.then();
+      checkFullHouse();
+      return;
+    }
+    i++;
+    const gap = dur * (ease(i / target) - ease((i - 1) / target));
+    run.t = setTimeout(step, Math.max(40, gap));
+  };
+  step();
+}
+
+/* ---------- full house: one-time celebration when every dish is covered ---------- */
+function checkFullHouse() {
+  const s = stats();
+  if (!s.total || s.claimed < s.total || meterAnim || showing) return;
+  const key = 'xmasFull:' + s.total;
+  if (store.get(key)) return;
+  store.set(key, '1');
+  const banner = $('fullhouse');
+  banner.querySelector('b').textContent = `All ${s.total} dishes are covered!`;
+  banner.classList.add('show');
+  fanfare();
+  [0, 350, 700].forEach((d, i) => setTimeout(() => burst(innerWidth * (0.2 + i * 0.3), innerHeight * 0.3, 90), d));
+  setTimeout(() => banner.classList.remove('show'), 6500);
 }
 
 /* ---------- showtime: curtains → marquee → reveal ---------- */
-const MQ_FONT = { griswold: "'Bungee Shade'", elf: "'Chewy'", grinch: "'Mountains of Christmas'", homealone: "'Permanent Marker'", polar: "'Rye'", wonderful: "'Limelight'", diehard: "'Anton'", sadtree: "'Short Stack'", frosty: "'Fredoka'", hallmark: "'Great Vibes'", rudolph: "'Sniglet'", carol: "'IM Fell English SC'", miracle: "'DM Serif Display'" };
+const MQ_FONT = { griswold: "'Bungee Shade'", elf: "'Chewy'", grinch: "'Mountains of Christmas'", homealone: "'Permanent Marker'", polar: "'Rye'", wonderful: "'Limelight'", diehard: "'Anton'", sadtree: "'Short Stack'", frosty: "'Fredoka'", hallmark: "'Great Vibes'", rudolph: "'Sniglet'", carol: "'IM Fell English SC'", miracle: "'DM Serif Display'", puppets: "'Luckiest Guy'" };
 let showing = false, skipShow = null;
 const wait = (ms) => new Promise((r) => { const t = setTimeout(r, ms); skipShow = () => { clearTimeout(t); r(); }; });
 
@@ -102,13 +155,14 @@ async function showtime(next, after) {
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   st.classList.add('shut');                       // curtains swing closed
   await wait(950);
-  applyTheme(next); window.scrollTo({ top: 0, behavior: 'instant' }); // swap the movie behind the curtain
+  applyTheme(next, 'empty'); window.scrollTo({ top: 0, behavior: 'instant' }); // swap the movie behind the curtain
   st.classList.add('lit'); fanfare();            // marquee + spotlight
   setTimeout(() => burst(innerWidth / 2, innerHeight * 0.38, 90), 250);
   await wait(2300);                               // hold: time to read it
   st.classList.remove('lit'); st.classList.add('leave');
   await wait(300);
   st.classList.remove('shut'); whoosh();          // curtains part
+  setTimeout(() => playMeter(), 450);             // ...and the gadget builds up as they open
   await wait(1150);
   st.className = 'stage';
   document.body.classList.remove('showtime');
@@ -130,9 +184,11 @@ async function load() {
     $('cats').innerHTML = '<p class="loading">Couldn’t reach the North Pole server. Try refreshing in a sec. 📡</p>';
     return;
   }
+  const first = !loadedOnce; loadedOnce = true;
   items = a.data; rsvps = b.data;
   if (c.data) votes = c.data.map((v) => v.vote);
   renderAll();
+  if (first && !showing) playMeter(); else checkFullHouse();
 }
 let reloadT;
 const reloadSoon = () => { clearTimeout(reloadT); reloadT = setTimeout(load, 250); };
@@ -147,7 +203,7 @@ function stats() {
 
 function renderAll() {
   if (!theme) return;
-  theme.meter($('meter'), stats());
+  if (!meterAnim) theme.meter($('meter'), stats());
   renderItems();
   renderRsvps();
   renderPoll();
@@ -567,8 +623,9 @@ const burst = (x, y, n) => fx.burstAt(x, y, n);
 
 /* ---------- easter eggs ---------- */
 // 1: the progress gadget does a movie gag
-$('meter').addEventListener('click', () => theme.gag($('meter')));
-$('meter').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); theme.gag($('meter')); } });
+const tapMeter = () => { if (meterAnim) return; audio(); playMeter({ sound: true, then: () => theme.gag($('meter')) }); };
+$('meter').addEventListener('click', tapMeter);
+$('meter').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tapMeter(); } });
 
 // 2: tap the date → sleigh flyover
 $('dateFact').addEventListener('click', () => {
